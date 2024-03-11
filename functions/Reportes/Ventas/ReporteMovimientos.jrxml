@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="reportCotizado" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryWithPageHeaderAndFooter="true" uuid="037e8bee-3d4e-4eec-bc54-4e112eb71a03">
+	<property name="ireport.zoom" value="1.5026296018031582"/>
+	<property name="ireport.x" value="238"/>
+	<property name="ireport.y" value="48"/>
+	<parameter name="idOrder" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="fecha" class="java.lang.String"/>
+	<parameter name="Observacion" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT cliente.id_cliente,cliente.nombre_completo,cliente.clasificacion,pedido.id,sum(detalle_pedido.monto) AS importe,
+(
+	SELECT
+		CASE
+			WHEN SUM(detalle_pedido.monto) IS NULL then 0
+			ELSE SUM(detalle_pedido.monto)
+		END
+	FROM detalle_pedido WHERE detalle_pedido.agregados > 0 AND detalle_pedido.id_detalle = $P{idOrder}
+) AS importe_facturado,
+(
+	SELECT
+		CONCAT(bitacora.fecha,' ',bitacora.hora)
+	FROM bitacora WHERE bitacora.descripcion LIKE '%AUTORIZADO%' AND bitacora.pedido = $P{idOrder} LIMIT 1
+) AS pedido_autorizado,
+(
+	SELECT
+		surtir_pedido.hora_inicio
+	from
+		surtir_pedido
+	WHERE surtir_pedido.id_pedido = $P{idOrder} LIMIT 1
+) AS inicio_surtido,
+(
+	SELECT surtir_pedido.hora_final
+	FROM surtir_pedido
+	WHERE surtir_pedido.id_pedido = $P{idOrder} LIMIT 1
+) AS fin_surtido,
+(
+	SELECT
+		CONCAT(bitacora.fecha,' ',bitacora.hora)
+	FROM
+		bitacora
+	WHERE
+		bitacora.descripcion LIKE '%CHECADO%' AND bitacora.pedido = $P{idOrder}
+) AS pedido_checado,
+(
+	SELECT
+		CONCAT(bitacora.fecha,' ',bitacora.hora)
+	FROM bitacora WHERE bitacora.descripcion LIKE'%DESCARGADO Y FACTURADO%' AND bitacora.pedido = $P{idOrder}
+)AS pedido_facturado
+FROM cliente
+INNER JOIN pedido ON cliente.id_cliente = pedido.cliente
+INNER JOIN detalle_pedido ON pedido.id = detalle_pedido.id_detalle
+WHERE pedido.id = $P{idOrder};]]>
+	</queryString>
+	<field name="id_cliente" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="nombre_completo" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="clasificacion" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="id" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="importe" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="importe_facturado" class="java.math.BigDecimal"/>
+	<field name="pedido_autorizado" class="java.lang.String"/>
+	<field name="inicio_surtido" class="java.sql.Timestamp"/>
+	<field name="fin_surtido" class="java.sql.Timestamp"/>
+	<field name="pedido_checado" class="java.lang.String"/>
+	<field name="pedido_facturado" class="java.lang.String"/>
+	<title>
+		<band height="82" splitType="Stretch">
+			<image scaleImage="FillFrame">
+				<reportElement x="0" y="0" width="752" height="79" uuid="e0e9a744-f02b-4849-a08d-a82352114ec3"/>
+				<imageExpression><![CDATA["http://192.168.0.18/KachaWeb/img/logocat.jpg"]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="88" splitType="Stretch">
+			<rectangle>
+				<reportElement x="639" y="5" width="111" height="14" forecolor="#FF3333" backcolor="#FF3333" uuid="d80fa821-9423-4851-823e-5611d5154df1"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="5" width="634" height="32" uuid="ea7b6150-d3df-4ae2-b2ed-833950442aa8"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="639" y="4" width="111" height="32" uuid="69fdca7d-1cf5-41e7-b99f-8ce1fd5c8838"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="639" y="5" width="66" height="14" forecolor="#FFFFFF" uuid="072d314a-987d-493d-b9ad-438d8ba419a8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[SERIE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="705" y="5" width="45" height="14" forecolor="#FFFFFF" uuid="639e6ba2-9ba0-448a-9937-8a04e0f6f987"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[FOLIO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="639" y="23" width="66" height="9" uuid="1209d34c-dfc7-48ae-b7e5-c4fb7840e0b5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Reporte]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="705" y="19" width="45" height="17" uuid="fbf1f6db-97f5-4efb-b543-0d1955e418cb"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{idOrder}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement mode="Transparent" x="0" y="41" width="634" height="44" uuid="00b685a7-0e30-42c7-bdb2-97226bff66df"/>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Transparent" x="639" y="41" width="111" height="44" uuid="490fd099-b55c-4a01-b025-6ab290780ecf"/>
+			</rectangle>
+			<textField>
+				<reportElement x="639" y="41" width="111" height="44" uuid="390b747a-3830-43f6-aa59-c637c04dc84f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{fecha}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="41" width="276" height="12" uuid="164d1d08-e951-4811-b872-be2232d921c1"/>
+				<box leftPadding="2">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[OBSERVACIONES:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="53" width="616" height="32" uuid="faeee233-beaa-44f8-9225-e895eb6b1dab"/>
+				<box topPadding="4" leftPadding="2">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{Observacion}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="13" width="616" height="20" uuid="228916c2-095a-4354-b434-127fd732c0ee"/>
+				<box leftPadding="2"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[HISTORIAL DE MOVIMIENTOS DE PEDIDO]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="15">
+			<staticText>
+				<reportElement x="24" y="0" width="219" height="14" uuid="7a0673c6-b77f-49d4-801b-18ef30c594ba"/>
+				<box leftPadding="2">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NOMBRE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="24" height="14" uuid="f98ddc53-832f-4299-b3d5-2b87a5691a4b"/>
+				<box leftPadding="2">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CTE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="243" y="0" width="39" height="14" uuid="0a825f33-5982-4134-bd34-62ad2c216bb3"/>
+				<box leftPadding="2">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CLSF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="282" y="0" width="45" height="14" uuid="32c80d26-41ae-4223-9e78-f023a0d002d1"/>
+				<box leftPadding="2">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PEDIDO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="327" y="0" width="55" height="14" uuid="39e9b26f-549b-4980-b3b2-698cf14817b7"/>
+				<box leftPadding="2">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[IMPORTE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="382" y="0" width="65" height="14" uuid="db39a90b-861d-4b42-b9fb-9603f4fe59de"/>
+				<box leftPadding="2">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[IMP FACT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="447" y="0" width="53" height="14" uuid="f7a38c6c-5485-44b8-b0ff-44089582eb44"/>
+				<box leftPadding="2">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[F AUT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="500" y="0" width="66" height="14" uuid="bab91378-8fa7-4a18-9af4-37fa5a373a86"/>
+				<box leftPadding="2">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[I SURTIDO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="566" y="0" width="66" height="14" uuid="b42884fe-b798-4a27-9323-a63ae5a79728"/>
+				<box leftPadding="2">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[F SURTIDO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="632" y="0" width="62" height="14" uuid="dca46408-99c5-4f37-a332-c069d48b7b4f"/>
+				<box leftPadding="2">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CHECKOUT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="694" y="0" width="56" height="14" uuid="87cdb959-070d-40ff-afc8-6891ff8b239a"/>
+				<box leftPadding="2">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PED FACT]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" mode="Transparent" x="24" y="0" width="219" height="30" forecolor="#000000" backcolor="#000000" uuid="f1c51cf9-6fe1-42c4-9748-46e06ae8155a"/>
+				<box>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true" isItalic="true" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nombre_completo}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="d/M/yyyy">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="447" y="0" width="53" height="30" uuid="a75962e6-5539-4bd9-92fd-88b8b52d0c11"/>
+				<box leftPadding="5" rightPadding="0">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pedido_autorizado}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="h.mm.ss a">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="500" y="0" width="66" height="30" uuid="6bc825ad-528d-497d-916a-609b00ea2960"/>
+				<box leftPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{inicio_surtido}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="243" y="0" width="39" height="30" uuid="4a057a37-3214-4e16-87cd-e16811910e40"/>
+				<box leftPadding="2">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{clasificacion}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="342" y="0" width="40" height="30" uuid="c07d57fe-63f0-4892-b239-d635a63a8e0d"/>
+				<box leftPadding="2">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{importe}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="397" y="0" width="50" height="30" uuid="3e5d35ac-794e-4cd0-8486-f54fba625c69"/>
+				<box leftPadding="2">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{importe_facturado}==null?0.00:$F{importe_facturado})]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="0" y="0" width="24" height="30" uuid="283bfde4-3b87-43f9-8559-3556b8ffaf4a"/>
+				<box leftPadding="2">
+					<pen lineStyle="Dashed"/>
+					<topPen lineStyle="Dashed"/>
+					<leftPen lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{id_cliente}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="282" y="0" width="45" height="30" uuid="c0f05238-cfb3-4ff6-bf6e-f7439e94b7da"/>
+				<box leftPadding="2">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="h.mm.ss a">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="566" y="0" width="66" height="30" uuid="b0a0ee8e-88eb-4865-bfc8-33125d1669e4"/>
+				<box leftPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fin_surtido}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="h.mm.ss a">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="632" y="0" width="62" height="30" uuid="394637f1-b19d-4d95-898a-f9fc3bbd61d4"/>
+				<box leftPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pedido_checado}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="h.mm.ss a">
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="694" y="0" width="58" height="30" uuid="8f01e307-40bd-4be6-803e-c17634a3ed45"/>
+				<box leftPadding="3">
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{pedido_facturado}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="382" y="0" width="15" height="30" uuid="982d1b48-7f89-43d6-bd06-bb6ebba312ad"/>
+				<box topPadding="1" leftPadding="0">
+					<pen lineWidth="0.5" lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[$]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="FixRelativeToBottom" stretchType="RelativeToBandHeight" x="327" y="0" width="15" height="30" uuid="60e00240-35dc-46f8-aa77-7e248e742434"/>
+				<box topPadding="1" leftPadding="0">
+					<pen lineWidth="0.5" lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[$]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="32"/>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="155">
+			<staticText>
+				<reportElement x="37" y="36" width="223" height="31" uuid="2f660b93-4140-4769-8f60-8ddd1705514a"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[contacto@ipadsa.com.mx]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="37" y="97" width="223" height="54" uuid="4bd6397d-b0cd-404c-b098-b00db8652184"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Antonio P. Araujo 59
+Santa Martha Acatitla
+09510, Iztapalapa
+México, Cd. Mex]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="37" y="67" width="223" height="30" uuid="e3f8cb9e-0137-4fc0-af83-8abb24959099"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[www.ipadsa.com.mx]]></text>
+			</staticText>
+			<image scaleImage="RealSize">
+				<reportElement x="8" y="4" width="22" height="20" uuid="fd60d3c4-1098-4b48-8f92-a34934219766"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5"/>
+				<imageExpression><![CDATA["http://192.168.0.18/KachaWeb/img/llamada.png"]]></imageExpression>
+			</image>
+			<image scaleImage="RealSize">
+				<reportElement x="8" y="36" width="22" height="20" uuid="0255c2c9-e4cc-441e-b4d3-f854f9319b47"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5"/>
+				<imageExpression><![CDATA["http://192.168.0.18/KachaWeb/img/email.png"]]></imageExpression>
+			</image>
+			<image scaleImage="RealSize">
+				<reportElement x="8" y="97" width="22" height="20" uuid="9967bee3-4d20-4d08-90a1-d4bb50a7f811"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5"/>
+				<imageExpression><![CDATA["http://192.168.0.18/KachaWeb/img/ubicacion.png"]]></imageExpression>
+			</image>
+			<image scaleImage="RealSize">
+				<reportElement x="8" y="67" width="22" height="20" uuid="6153020c-a7dd-4a0d-abb9-7c307f5b0260"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5"/>
+				<imageExpression><![CDATA["http://192.168.0.18/KachaWeb/img/navegador.png"]]></imageExpression>
+			</image>
+			<line>
+				<reportElement x="0" y="0" width="750" height="1" uuid="4534caab-2172-40e4-9803-ec883afc7c2a"/>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="151" width="750" height="1" uuid="62da398a-0bbe-4aa2-87d7-e4b25f852f9c"/>
+				<graphicElement>
+					<pen lineWidth="2.0"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="37" y="4" width="223" height="32" uuid="42cc84f7-1087-4d59-affe-33862f491e98"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[55-4197-0727]]></text>
+			</staticText>
+		</band>
+	</lastPageFooter>
+</jasperReport>

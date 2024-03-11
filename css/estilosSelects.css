@@ -1,0 +1,37 @@
+:root{
+    --pastel-autorizados:#d1e7dd;
+    --pastel-porsurtir:#fff3cd;
+    --pastel-facturados:#cff4fc;
+    --pastel-enviados:#b6b5b7;
+    --pastel-surtiendo:rgb(226, 241, 255);
+}
+
+.bg-autorizados{
+    --bs-bg-opacity:1;
+    background-color: var(--pastel-autorizados) !important;
+    color: black;
+}
+
+.bg-porsurtir{
+    --bs-bg-opacity:1;
+    background-color: var(--pastel-porsurtir) !important;
+    color: black;
+}
+
+.bg-facturados{
+    --bs-bg-opacity:1;
+    background-color: var(--pastel-facturados) !important;
+    color: black;
+}
+
+.bg-enviados{
+    --bs-bg-opacity:1;
+    background-color: var(--pastel-enviados) !important;
+    color: black;
+}
+
+.bg-surtiendo{
+    --bs-bg-opacity:1;
+    background-color: var(--pastel-surtiendo) !important;
+    color: black;
+}

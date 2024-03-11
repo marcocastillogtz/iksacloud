@@ -1,0 +1,83 @@
+BEGIN 
+		/*
+		INSERT INTO detalle_pedido(VENDEDOR,CLAVE,DESCRIPCION,PRECIO,CANTIDAD,FECHA,CLIENTE,ID_DETALLE,ESTATUS,MONTO,RESTRICCION,FAM_OFERTA,FAM_ACUERDO,ESTATUS_OFERTA,PAQUETE,PIEZA,PORCENTAJE,COMISION,PRECIOLISTA,AGREGADOS,NOTIFICACION,PORCENTAJE_F,COMISION_F)
+		SELECT vendedor,clave,descripcion,precio,cantidad,fecha,cliente,id_detalle,estatus,monto,restriccion,fam_oferta,fam_acuerdo,estatus_oferta,paquete,pieza,porcentaje,comision,preciolista,agregados,notificacion,porcentaje_f,comision_f 
+		FROM detalle_pedido WHERE id_detalle = var_id;
+		*/
+		DECLARE ROW_ORDER INT;
+		DECLARE ID_ORDER INT;
+		
+		DECLARE VAR_CLIENTE VARCHAR(45);
+		/*DECLARE VAR_DOCUMENTO VARCHAR(45);*/
+		
+		DECLARE VAR_VENDEDOR INT;
+		DECLARE VAR_HORA TIME;
+		DECLARE VAR_FECHA DATE;
+		DECLARE VAR_ESTATUS VARCHAR(45);
+		DECLARE VAR_OBSERVACION VARCHAR(900);
+		DECLARE VAR_FOLIO VARCHAR(45);
+		DECLARE VAR_USUARIO INT;
+		DECLARE var_fechaa DATE;
+		DECLARE VAR_DOCUMENTO VARCHAR(20);
+		DECLARE V_FOLIO VARCHAR(20);
+		
+		
+		SELECT cliente INTO VAR_CLIENTE FROM pedido WHERE ID = var_id;
+		SELECT documento INTO VAR_DOCUMENTO FROM pedido WHERE ID = var_id;
+		
+		SELECT vendedor INTO VAR_VENDEDOR FROM pedido WHERE ID = var_id;
+		SELECT hora INTO VAR_HORA FROM pedido WHERE ID = var_id;
+		SELECT fecha INTO VAR_FECHA FROM pedido WHERE ID = var_id;
+		SELECT estatus INTO VAR_ESTATUS FROM pedido WHERE ID = var_id;
+		SELECT observacion INTO VAR_OBSERVACION FROM pedido WHERE ID = var_id;
+		SELECT folio INTO VAR_FOLIO FROM pedido WHERE ID = var_id;
+		SELECT usuario INTO VAR_USUARIO FROM pedido WHERE ID = var_id;
+		
+		SELECT DATE(NOW()) INTO var_fechaa;
+		
+
+		SELECT COUNT(ID) INTO ROW_ORDER FROM pedido WHERE ESTATUS='P' AND cliente = VAR_CLIENTE AND FECHA = STR_TO_DATE(NOW(),'%Y-%m-%d') AND DOCUMENTO = VAR_DOCUMENTO;
+		
+		IF ROW_ORDER = 0 THEN
+			
+			
+			#INSERTPEDBACK
+			
+			INSERT INTO pedido (cliente,vendedor,fecha,hora,documento,estatus,observacion,folio,usuario) 
+			VALUES(VAR_CLIENTE,VAR_VENDEDOR,var_fechaa,VAR_HORA,VAR_DOCUMENTO,'P',VAR_OBSERVACION,VAR_FOLIO,VAR_USUARIO);
+			
+			
+			SELECT id INTO ID_ORDER FROM pedido WHERE cliente = VAR_CLIENTE AND fecha = STR_TO_DATE(NOW(),'%Y-%m-%d') AND documento = VAR_DOCUMENTO AND estatus = 'P';
+			
+			#FIN INSERTPEDBACK
+			
+			
+			#GENERATE FILE
+			
+			IF VAR_DOCUMENTO LIKE 'Remision' THEN 
+				SET VAR_DOCUMENTO='R';
+			ELSE
+				SET VAR_DOCUMENTO='F';
+			END IF;
+				
+			SET V_FOLIO = CONCAT(VAR_DOCUMENTO,var_fechaa,LPAD(ID_ORDER,5,'0'));
+			UPDATE pedido SET folio = V_FOLIO WHERE ID = ID_ORDER;
+			
+			#DELETE  FROM DETALLE WHERE ID NOT IN(SELECT * FROM (SELECT MIN(ID) FROM DETALLE WHERE ID_DETALLE = IN_IDPEDIDO GROUP BY CLAVE) claves AND ID_DETALLE = IN_IDPEDIDO);
+			
+			/* no se para que sirve 
+			DELETE FROM detalle_pedido  WHERE id NOT IN (SELECT * FROM (SELECT MIN(id) FROM detalle_pedido WHERE id_detalle = var_id GROUP BY clave AND id_detalle = var_id) AS t1);
+			*/
+			
+			#SELECT CONCAT_WS('/',ID_ORDER,0);
+			#SELECT ID_ORDER;
+			SELECT V_FOLIO;
+		ELSE
+			
+			#INSERTPEDBACK
+			SELECT id INTO ID_ORDER FROM pedido WHERE cliente = VAR_CLIENTE AND fecha = STR_TO_DATE(NOW(),'%Y-%m-%d') AND documento = VAR_DOCUMENTO AND estatus = 'P';
+			#SELECT CONCAT_WS('/',ID_ORDER,1);
+			#SELECT ID_ORDER;
+			SELECT ID_ORDER,1;
+		END IF;
+END

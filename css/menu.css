@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+.fdmzone-menu{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins',sans-serif;
+}
+
+.fdmbody-menu{
+    min-height: 50vh;
+}
+
+
+.fdm-wrapper{
+    z-index: 10;
+    position: absolute;
+    visibility: hidden;
+    width: 200px;
+    background: #fff;
+    border-radius: 10px;
+    color: black;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1); 
+}
+
+.fdm-wrapper .fdm-menu{ 
+    padding: 10px 12px;
+}
+
+.fdm-content .fdm-item{
+    list-style: none;
+    font-size: 14px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+    padding: 0 5px 0 10px;
+    border-radius: 5px;
+    margin-bottom: 2px;
+}
+
+
+.fdm-content .fdm-item:hover{
+    background: #f2f2f2;
+}
+
+.fdm-content .fdm-item span{
+    font-size: 14px;
+    margin-left: 8px;
+}
+
+.fdm-content .fdm-menu-item{
+    display: flex;
+    padding: 5px 12px;
+    border-top: 1px solid #ccc;
+}
+
+.fdm-content .fdm-menu-display{
+    position: relative;
+    justify-content: space-between;
+}
+
+.fdm-menu-display .fdm-submenu{
+    position: absolute;
+    background: #fff;
+    width: 200px;
+    right: -200px;
+    top: -35px;
+    padding: 13px;
+    opacity: 0;
+    pointer-events: none;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.08);
+    transition: 0.25s ease;
+}
+
+.fdm-menu-display:hover .fdm-submenu{
+    opacity: 1;
+    pointer-events: auto;
+}
