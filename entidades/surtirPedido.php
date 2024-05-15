@@ -12,6 +12,7 @@
         private $idPedido;
         private $observacion;
         private $token;
+        private $msg_err;
 
         protected $db;
 
@@ -128,6 +129,10 @@
         }
 
 
+        function getErrSQL()
+        {
+            return $this->msg_err;
+        }
 
         function saveLooter() {
             $query = "CALL register_looter(:token,:orden);";
@@ -140,4 +145,29 @@
             return $statement->fetchAll(PDO::FETCH_ASSOC);
         }
         
+
+        function autorizarPedido() {
+            try {
+                // $query = "UPDATE SURTIR_PEDIDO SET hora_final=CURRENT_TIMESTAMP(), AUTORIZADO=1, TIEMPO_ESTIMADO=CONCAT_WS(' ',TIMEDIFF(hora_final,hora_inicio),'min'), OBSERVACION='$var_observacion' WHERE id_pedido=$var_id AND USUARIO=$var_usuario;";
+                $query = "UPDATE surtir_pedido SET hora_final=CURRENT_TIMESTAMP(),autorizado = 1,tiempo_estimado=CONCAT_WS(' ',TIMEDIFF(hora_final,hora_inicio),'min'), observacion=:observacioness WHERE id_pedido =:idd AND usuario = :usuario;";
+                $statement =  $this->db->prepare($query);
+                $statement->bindParam(":idd",$this->idSurtirP,PDO::PARAM_INT);
+                $statement->bindParam(":usuario",$this->usuario,PDO::PARAM_INT);
+                $statement->bindParam(":observacioness",$this->observacion,PDO::PARAM_STR);
+                
+                // $statement->bindParam(":porcentaje",$this->porcentaje,PDO::PARAM_INT);
+                return $statement->execute();          
+    
+            } catch (PDOException $e) {
+                $this->msg_err = $e->getMessage();
+            }
+        }
+
+        function getPedidoProgress() {
+            $query = "SELECT * FROM SURTIENDO;";
+            $statement = $this->db->prepare($query);
+            $statement->execute();
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+            
+        }
     }

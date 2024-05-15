@@ -306,7 +306,7 @@ function getDataProductDetallePedido(id) {
 
 $(document).on('click','#btnInsertarPartida', function() {
     $("#addItemBackorder").modal('show');    
-
+/*
     let folio = $("#txtFolioModalBackOrderPartidasDebidas").val();
     let id = $("#txtIdPedidoModalBackOrderPartidasDebidas").val();
     let folioNVO = folio.replace(/F|R/g, "BK:B");
@@ -318,10 +318,24 @@ $(document).on('click','#btnInsertarPartida', function() {
     arrData.push(folioNVO);
 
     getLP(arrData);
-
+*/
     //getLP(id,folio);
     // alert('este es el folio para insertar..'+folio);
     // alert('este es el id para insertar..'+id);
+});
+
+$(document).on('click','#btn_genFolioAdd', function() {
+    let folio = $("#txtFolioModalBackOrderPartidasDebidas").val();
+    let id = $("#txtIdPedidoModalBackOrderPartidasDebidas").val();
+    let folioNVO = folio.replace(/F|R/g, "BK:B");
+
+    arrData=[];
+    arrData.push('getLPInsert');
+    arrData.push(id);
+    arrData.push(folio);
+    arrData.push(folioNVO);
+
+    getLP(arrData);
 });
 
 
@@ -407,6 +421,10 @@ function getLP(arrData) {
 
                                     $("#txt_folioNuevo").val(arrOrdenFolio[0]);
                                     $("#txt_idNuevo").val(arrOrdenFolio[1]);
+                                    
+                                    $("#btn_insertPartidaAdd").prop('disabled',false);
+                                    $("#txt_claveAdd").prop('disabled',false);
+                                    $("#txt_cantidadAdd").prop('disabled',false);
 
                                  } else {
                                      alert('Operacion Invalida');
@@ -453,10 +471,13 @@ function getLP(arrData) {
 
 $(document).on('click', '#btn_sendOrder', function () {
     let tipoEnvio = $("#select_envio").val();
-
+    let folio = $("#txt_folioNuevo").val();
+    
     if (tipoEnvio == 'All') {
         alert('Debes de seleccionar una opcion');
-    } else {
+    } else if(folio==null || folio =='F|R---------------'){
+        alert('Debes de generar un folio antes de continuar con el proceso');
+    }else {
         actualizarPedido();
     }
 });
@@ -501,7 +522,11 @@ function actualizarPedido() {
         }).then((response)=>{
             if (response == 1) {
                 $("#addItemBackorder").modal('hide');
+                $("#modalBackOrder").modal('hide');
+                showOrdersBack('*');
+                showProductsDemand();
             } else {
+                console.log('No se cerrara el modal');
             }
     })
 
@@ -575,6 +600,180 @@ function eliminarPartida(idd) {
     })
 
 }
+var delayTimer;
+
+$(document).on('keyup','#txt_claveAdd',function() {
+    var key = $('#txt_claveAdd').val();
+    Mayuscula(key);
+    clearTimeout(delayTimer);
+    delayTimer = setTimeout(function() {
+        if (key.length > 8 && key.length < 10) {
+            consultarClave();
+        } else {
+            $("#txt_cantidadAdd").val("");
+            $("#txt_descripcionAdd").val("");
+            $("#txt_precioivaAdd").val("");
+            $("#txt_precioOfertaAdd").val("");
+            $("#txt_RestriccionAdd").val("");
+            $("#txt_FamOfertaAdd").val("");
+            $("#txt_totalAdd").val(""); 
+        }
+    },100);
+});
+
+function consultarClave() {
+    let clave = $("#txt_claveAdd").val(); 
+    let folio = $("#txt_folioNuevo").val();
+
+    arrData=[];
+    arrData.push('consultarClave');
+    arrData.push(clave);
+    arrData.push(folio);
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url:"../../functions/ventas/mainBackOrder.php",
+            type:"GET",
+            data: { arrData },
+            success: function (response) {
+                let item = JSON.parse(response);
+                let template = "";
+                     item.forEach((item) => {
+                             if (item.validation == 1) {
+                                let formatMoney = Intl.NumberFormat('en-US');
+
+                                $("#txt_descripcionAdd").val(item.descripcion);
+                                $("#txt_precioivaAdd").val(formatMoney.format(item.precioEspecial));
+                                // $("#txt_precioOfertaAdd").val(formatMoney.format(item.PrecioOferta));
+                                $("#txt_precioOfertaAdd").val(formatMoney.format(item.precioVenta));
+                                $("#txt_FamOfertaAdd").val(item.familiaVenta);
+                                $("#txt_RestriccionAdd").val(item.restriccion);
+
+                             } else {
+                                $("#txt_descripcionAdd").val("Sin descripcion");
+                                $("#txt_precioOfertaAdd").val(0.0);
+                                $("#txt_FamOfertaAdd").val(0);
+                                $("#txt_RestriccionAdd").val("S/D");
+                             }
+                             resolve(item.validation);
+                        }); 
+                    },
+                    error: function (XMLHttpRequest, txtStatus, errorThrown) {
+                            alert("Request: "+XMLHttpRequest);
+                            alert("Estatus: "+txtStatus);
+                            alert("Error: "+errorThrown);
+                            reject(errorThrown);
+                    },
+            }); 
+        })
+}
+
+function Mayuscula(key) {
+    $("#txt_claveAdd").val(key.toUpperCase());
+}
+
+$(document).on('keyup','#txt_cantidadAdd',function() {
+    TotalAdd();
+    $("#btn_genFolioAdd").prop("disabled", true);
+    $("#btn_insertPartidaAdd").prop("disabled", false);
+});
+
+function TotalAdd() {
+    let formatMoney = Intl.NumberFormat('en-US');
+    let cantidad = $("#txt_cantidadAdd").val();
+    let precio = $("#txt_precioivaAdd").val();
+    
+    $("#txt_totalAdd").val(formatMoney.format(cantidad * precio));
+}
+
+$(document).on('click', '#btn_insertPartidaAdd', function () {
+    // let element = $(this)[0].parentElement.parentElement;
+    // let id = $(element).attr("taskId");
+    // let folio = $(element).attr("taskFolio");
+
+    let folio = $("#txt_folioNuevo").val();
+    let id = $("#txt_idNuevo").val();
+    let clave = $("#txt_claveAdd").val();
+    let cantidad = $("#txt_cantidadAdd").val();
+    let descripcion = $("#txt_descripcionAdd").val();
+    let precioIva = $("#txt_precioivaAdd").val();
+    let precioOfer = $("#txt_precioOfertaAdd").val();
+    let restAdd = $("#txt_RestriccionAdd").val();
+    let famOfer = $("#txt_FamOfertaAdd").val();
+    let total = $("#txt_totalAdd").val().replaceAll(",","");
+
+    if (folio == null || folio == 'F|R---------------' && id == null || id == '00000') {
+        alert('Debes de generar un folio antes de añadir un producto');
+    } else {
+        insertPartidaAdd(id,folio,clave,cantidad,descripcion,precioIva,precioOfer,restAdd,famOfer,total);
+    }
+
+});
+
+
+function insertPartidaAdd(id,fol,clv,cant,desc,precioIva,precioOfer,restAdd,famOfer,total) {
+    arrData=[];
+    arrData.push('insertPartidaAdd');
+    arrData.push(id);
+    arrData.push(fol);
+    arrData.push(clv);
+    arrData.push(cant);
+    arrData.push(desc);
+    arrData.push(precioIva);
+    arrData.push(precioOfer);
+    arrData.push(restAdd);
+    arrData.push(famOfer);
+    arrData.push(total);
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url:"../../functions/ventas/mainBackOrder.php",
+            type:"GET",
+            data: { arrData },
+            success: function (response) {
+                let item = JSON.parse(response);
+                let template = " ";
+                     item.forEach((item) => {
+                             if (item.validation == 1) {
+                                 alert('Se registro correctamente el producto');
+                             } else {
+                                 alert('Ocurrio un problema al registrar el producto')
+                             }
+                             resolve(item.validation);
+                        }); 
+                    },
+                    error: function (XMLHttpRequest, txtStatus, errorThrown) {
+                            alert("Request: "+XMLHttpRequest);
+                            alert("Estatus: "+txtStatus);
+                            alert("Error: "+errorThrown);
+                            reject(errorThrown);
+                    },
+            }); 
+        }).then((response)=>{
+            if (response == 1) {
+                return limpiarModalAgregarPartida();
+            } else {
+                console.log('No se limpiaran los campos del modal');
+                return 0;
+            }
+    })
+
+}
+
+
+function limpiarModalAgregarPartida() {
+    $("#txt_claveAdd").val('');
+    $("#txt_cantidadAdd").val('');
+    $("#txt_descripcionAdd").val('');
+    $("#txt_precioivaAdd").val('');
+    $("#txt_precioOfertaAdd").val('');
+    $("#txt_RestriccionAdd").val(''); 
+    $("#txt_FamOfertaAdd").val(''); 
+    $("#txt_totalAdd").val('');    
+ 
+    return 1;
+}
+
 
 $(document).on('click', '#verPedidos', function () {
     let element = $(this)[0].parentElement.parentElement;

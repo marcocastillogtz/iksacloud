@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="listOrders" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="20b346f5-c8b1-474e-87c4-a044bc373472">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="ESTATUS">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[($F{ESTATUS}=="AT")]]></conditionExpression>
+			<style mode="Opaque" forecolor="#000000" backcolor="#CCFFCC">
+				<pen lineColor="#339900"/>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[($F{ESTATUS}=="DN")]]></conditionExpression>
+			<style mode="Opaque" forecolor="#000000" backcolor="#FF9999">
+				<pen lineWidth="2.0" lineColor="#FFFFFF"/>
+			</style>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[($F{ESTATUS}=="E")]]></conditionExpression>
+			<style mode="Opaque" forecolor="#333333" backcolor="#CCCCFF"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="VENDEDOR" class="java.lang.String"/>
+	<parameter name="CLIENTE" class="java.lang.String"/>
+	<parameter name="FECHA_A" class="java.lang.String"/>
+	<parameter name="FECHA_B" class="java.lang.String"/>
+	<parameter name="QUERY" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT PEDIDO.ID,CONCAT(USUARIO.NOMBRE,' ',USUARIO.APELLIDO_P,' ',USUARIO.APELLIDO_M) AS VENDEDOR,
+                    NOMBRE_COMPLETO AS CLIENTE,
+                    PEDIDO.OBSERVACION,
+                    PEDIDO.FECHA,
+                    PEDIDO.HORA,
+                    DETALLE_PEDIDO.MONTO,
+                    ID_CLIENTE,
+                    PEDIDO.DOCUMENTO,
+                    TIMESTAMPDIFF(DAY,FECHA,NOW()-INTERVAL 5 HOUR) AS DIAS,
+		TIMESTAMPDIFF(HOUR,HORA,NOW()-INTERVAL 5 HOUR) AS HORAS,
+                    PEDIDO.ESTATUS,
+		CASE
+		WHEN PEDIDO.ESTATUS='PS' THEN "Sin Facturar"
+		WHEN PEDIDO.ESTATUS='FT' THEN "Facturado"
+		END AS EXCEPTION
+                    FROM PEDIDO
+                    LEFT JOIN (SELECT SUM(MONTO) AS MONTO,ID_DETALLE FROM DETALLE_PEDIDO GROUP BY ID_DETALLE) DETALLE_PEDIDO ON PEDIDO.ID = DETALLE_PEDIDO.ID_DETALLE
+                    INNER JOIN USUARIO ON USUARIO.ID=PEDIDO.VENDEDOR
+                    INNER JOIN CLIENTE ON CLIENTE.ID_CLIENTE=PEDIDO.CLIENTE
+                    WHERE $P{QUERY}
+                    GROUP BY PEDIDO.ID ORDER BY ID DESC;]]>
+	</queryString>
+	<field name="ID" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="VENDEDOR" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="CLIENTE" class="java.lang.String"/>
+	<field name="OBSERVACION" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="FECHA" class="java.sql.Date">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="HORA" class="java.sql.Time">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="MONTO" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ID_CLIENTE" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DOCUMENTO" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="DIAS" class="java.lang.Long">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="HORAS" class="java.lang.Long">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="ESTATUS" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="EXCEPTION" class="java.lang.String"/>
+	<variable name="ID_1" class="java.lang.Integer" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{ID}]]></variableExpression>
+	</variable>
+	<group name="Cliente">
+		<groupExpression><![CDATA[$F{CLIENTE}]]></groupExpression>
+		<groupHeader>
+			<band height="22">
+				<textField>
+					<reportElement x="0" y="0" width="314" height="22" uuid="927efb41-4627-4888-83eb-e903dff932dc"/>
+					<box leftPadding="5"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CLIENTE}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="68" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="158" y="0" width="397" height="26" forecolor="#FFFFFF" backcolor="#FF3333" uuid="61190adc-6e61-4946-9f61-1e65152f837d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[HISTORICO DE PEDIDOS]]></text>
+			</staticText>
+			<image>
+				<reportElement x="0" y="0" width="158" height="63" uuid="054a97dd-1ba1-4a71-999b-0d8192190649"/>
+				<imageExpression><![CDATA["http://192.168.0.38/KachaWeb/img/logo.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="158" y="26" width="397" height="37" uuid="5d07e985-4d15-49bd-9d0a-90586c14f167"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<text><![CDATA[POR CLIENTE]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="123">
+			<staticText>
+				<reportElement x="0" y="0" width="87" height="20" uuid="fcfe61e1-7f93-4bfe-a590-0514feacd24b"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Filtrar por]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="60" height="14" uuid="e6e585b5-9ecd-428f-a828-7c19ade64e45"/>
+				<textElement>
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vendedor:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="34" width="60" height="14" uuid="7f2df893-c46d-45f6-b278-766222bb9985"/>
+				<textElement>
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cliente:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="48" width="206" height="14" forecolor="#FFFFFF" backcolor="#FF6666" uuid="73d309f5-b740-425b-9d2c-0cfe77a0b485"/>
+				<box leftPadding="5">
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#FF0000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#FF0000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#FF0000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#FF0000"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Rango de fechas:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="62" width="47" height="14" uuid="482703bf-2fa3-4035-bb9f-dd70ca728f63"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Desde:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="76" width="47" height="14" uuid="174f2bfe-19fd-4d50-b86f-6f20f060b9ca"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Hasta:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="60" y="20" width="254" height="14" uuid="f530e544-739f-4765-aeae-4158e5844ffb"/>
+				<textFieldExpression><![CDATA[$P{VENDEDOR}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="60" y="34" width="254" height="14" uuid="c165b4c9-432b-4038-be15-48bc990d2db4"/>
+				<textFieldExpression><![CDATA[$P{CLIENTE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="47" y="62" width="267" height="14" uuid="4fbf6adb-b533-45e5-a1fc-f0634b28a90f"/>
+				<textFieldExpression><![CDATA[$P{FECHA_A}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="47" y="76" width="267" height="14" uuid="b55506c7-8041-4b8f-b7d8-c5c949520082"/>
+				<textFieldExpression><![CDATA[$P{FECHA_B}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="1" width="47" height="20" backcolor="#F7F7E7" uuid="6ac2e394-a8e1-4b40-a419-e1dc99035a08"/>
+				<box>
+					<topPen lineWidth="2.0"/>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="47" y="1" width="64" height="20" backcolor="#F7F7E7" uuid="1c76436f-d9f1-44be-8203-2cd84c3be25f"/>
+				<box>
+					<topPen lineWidth="2.0"/>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Tipo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="111" y="1" width="143" height="20" backcolor="#F7F7E7" uuid="1dc03092-68eb-4017-84b9-dd5356904e4f"/>
+				<box leftPadding="2">
+					<topPen lineWidth="2.0"/>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Observación]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="314" y="1" width="100" height="20" backcolor="#F7F7E7" uuid="0b87fab0-70f3-4550-8513-05c97eaa0934"/>
+				<box leftPadding="2">
+					<topPen lineWidth="2.0"/>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Vendedor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="414" y="1" width="59" height="20" backcolor="#F7F7E7" uuid="eee6b97b-e915-46e8-a438-5bf9471fd1bb"/>
+				<box>
+					<topPen lineWidth="2.0"/>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Hora]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="473" y="1" width="82" height="20" backcolor="#F7F7E7" uuid="24f5724c-d12b-4f5b-b0fc-6cf4934dd2f5"/>
+				<box>
+					<topPen lineWidth="2.0"/>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Importe]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="254" y="1" width="60" height="20" backcolor="#F7F7E7" uuid="152711f7-9481-4cc2-8df4-8317314b98f5"/>
+				<box leftPadding="2">
+					<topPen lineWidth="2.0"/>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<text><![CDATA[Estatus]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<textField>
+				<reportElement style="ESTATUS" x="0" y="0" width="47" height="20" uuid="2b4ef5a8-cea1-474b-aee9-142261d970b2"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ID}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="ESTATUS" x="47" y="0" width="64" height="20" uuid="0ff7cf8c-ab76-47a2-bcac-ce06a565c407"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DOCUMENTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="ESTATUS" x="111" y="0" width="143" height="20" uuid="e50bdf77-bc98-44e6-8e40-6aee9c8bc374"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+					<topPen lineWidth="0.0" lineStyle="Solid"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OBSERVACION}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="ESTATUS" x="314" y="0" width="100" height="20" uuid="62dc4c78-7ba9-4bfa-a843-e10f081c9c2b"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{VENDEDOR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="h.mm a">
+				<reportElement style="ESTATUS" x="414" y="0" width="59" height="20" uuid="a5916e5e-14e3-4f1f-806e-d6b0d98e78be"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HORA}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement style="ESTATUS" x="473" y="0" width="82" height="20" uuid="88528027-9d7f-476e-bef5-e291015b8094"/>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Dashed"/>
+					<topPen lineWidth="0.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{MONTO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="254" y="0" width="60" height="20" uuid="7fa02639-d562-498f-91d3-d9b64c6e8397"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EXCEPTION}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="56" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

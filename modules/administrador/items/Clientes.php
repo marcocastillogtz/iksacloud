@@ -6,6 +6,7 @@ require_once('../../entidades/Comision.php');
 require_once('../../entidades/BancosClientes.php');
 require_once('../../entidades/MetodoDeVenta.php');
 require_once('../../entidades/Esquema.php');
+require_once('../../entidades/CFDI.php');
 $Estados_Object = new Estados;
 $estado_data = $Estados_Object->getAll();
 
@@ -30,6 +31,8 @@ $MetodoVenta_data = $MetodoDeVenta_object->getCodVenta();
 $Esquema_object = new Esquema;
 $Esquema_data1 = $Esquema_object->getClienteEsquema();
 
+$CFDI = new CFDI;
+$ListCFDI = $CFDI->getCFDI();
 ?>
 
 <!DOCTYPE html>
@@ -165,16 +168,16 @@ $Esquema_data1 = $Esquema_object->getClienteEsquema();
                     <div class="row my-2">
                         <div class="col-4">
                             <div class="list-group" id="list-tab" role="tablist">
-                                <a class="list-group-item list-group-item-action active" id="list-info-list" data-bs-toggle="list" href="#list-info" role="tab" aria-controls="list-info">Informacion General</a>
-                                <a class="list-group-item list-group-item-action" id="list-profile-list" data-bs-toggle="list" href="#list-profile" role="tab" aria-controls="list-profile">Informacion de Saldos</a>
-                                <a class="list-group-item list-group-item-action" id="list-messages-list" data-bs-toggle="list" href="#list-messages" role="tab" aria-controls="list-messages">Informacion de Ventas</a>
-                                <a class="list-group-item list-group-item-action" id="list-settings-list" data-bs-toggle="list" href="#list-settings" role="tab" aria-controls="list-settings">Bitacora de Movimientos</a>
-                                <a class="list-group-item list-group-item-action" id="list-contacts-list" data-bs-toggle="list" href="#list-contacts" role="tab" aria-controls="list-Contacts">Contactos</a>
+                                <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center active" id="list-info-list" data-bs-toggle="list" href="#list-info" role="tab" aria-controls="list-info">Informacion General <img src="../../img/iconos/outline/x16/info.png"></a>
+                                <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="list-profile-list" data-bs-toggle="list" href="#list-profile" role="tab" aria-controls="list-profile">Informacion de Saldos</a>
+                                <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="list-messages-list" data-bs-toggle="list" href="#list-messages" role="tab" aria-controls="list-messages">Informacion de Ventas</a>
+                                <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="list-settings-list" data-bs-toggle="list" href="#list-settings" role="tab" aria-controls="list-settings">Bitacora de Movimientos</a>
+                                <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="list-contacts-list" data-bs-toggle="list" href="#list-contacts" role="tab" aria-controls="list-Contacts">Contactos</a>
                             </div>
                         </div>
                         <div class="col-8">
                             <div class="tab-content" id="nav-tabContent">
-                                <div class="tab-pane fade show active" id="list-info" role="tabpanel" aria-labelledby="list-info-list"><?php include_once('tabsForms/Clientes/IG.php') ?></div>
+                                <div class="tab-pane fade show active" id="list-info" role="tabpanel" aria-labelledby="list-info-list"><?php include_once('tabsForms/Informacion Geneneral/Tabs.php') ?></div>
                                 <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">...</div>
                                 <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">...</div>
                                 <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">...</div>

@@ -18,6 +18,24 @@ class Producto{
     private $color;
     private $clave_sat;
     private $clave_unidad;
+    private $fk_lp;
+    private $startIndex;
+    private $perPage;
+    private $folio;
+    private $msg_err_Esq;
+
+
+    private $vendedor;
+    private $cantidad;
+    private $cliente;
+    private $pedido;
+    private $total;
+    private $restrinccion;
+    private $estatusOferta;
+    private $documento;
+
+
+    protected $db;
 
     public function __construct()
     {
@@ -182,6 +200,105 @@ class Producto{
         return $this->clave_unidad;   
     }
 
+    function setFkListaPrecio($fk_lp){
+        $this->fk_lp = $fk_lp;
+    }
+    function getFkListaPrecio(){
+        return $this->fk_lp;   
+    }
+    function setIndex($index)
+    {
+        $this->startIndex = $index;
+    }
+    
+    function getIndex()
+    {
+        return $this->startIndex;
+    }
+
+    function setLastPage($perPage)
+    {
+        $this->perPage = $perPage;
+    }
+
+    function getLastPage()
+    {
+        return $this->perPage;
+    }
+
+    function setFolio($fol){
+        $this->folio =$fol;
+    }
+    function getFolio(){
+        return $this->folio;
+    }
+
+    function setVendedor($vendedor){
+        $this->vendedor = $vendedor;
+    }
+    function getVendedor(){
+        return $this->vendedor;        
+    }
+
+
+    function setCantidad($cantidad){
+        $this->cantidad = $cantidad;
+    }
+    function getCantidad(){
+        return $this->cantidad;
+    }
+
+
+    function setCliente($cliente){
+        $this->cliente = $cliente;
+    }
+    function getCliente(){
+        return $this->cliente;        
+    }
+
+
+
+    function setPedido($pedido){
+        $this->pedido = $pedido;    
+    }
+    function getPedido(){
+        return $this->pedido;
+    }
+
+    function setTotal($total){
+        $this->total = $total;
+    }
+    function getTotal(){
+        return $this->total;
+    }
+
+    function setRestrinccion($restrinccion){
+        $this->restrinccion = $restrinccion;
+    }
+    function getRestrinccion(){
+        return $this->restrinccion;
+    }
+
+    function setEstatusOferta($estatusOferta) {
+        $this->estatusOferta = $estatusOferta;
+    }
+    function getEstatusOferta(){
+        return $this->estatusOferta;
+    }
+
+    function setDocumento($documento){
+        $this->documento = $documento;
+    }
+    function getDocumento() {
+        return $this->documento;
+    }
+
+    function getMessageERROR()
+    {
+        require_once('../diccionario.php');
+        $sqlMessage = $this->msg_err_Esq;
+        return getMessageSQL($sqlMessage);
+    }
 
     function getInfoClave(){
         $query="SELECT PRODUCTO.CLAVE AS CLAVE,
@@ -202,6 +319,94 @@ class Producto{
 
         $statement->execute();
         return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    function getKardex(){
+        //$query="SELECT * FROM  (SELECT @primid_lp:=:fk_lp) alias,kardex_producto LIMIT :startIndex,:perPage;";
+        /*
+        $query="SELECT * FROM  (SELECT @primid_lp:=:fk_lp) alias,kardex_producto;";
+        
+        $statement = $this->db->prepare($query);
+        $statement->bindParam(":fk_lp",$this->fk_lp, PDO::PARAM_INT);
+        $statement->bindParam(":startIndex",$this->startIndex, PDO::PARAM_INT);
+        $statement->bindParam(":perPage",$this->perPage, PDO::PARAM_INT);
+        */
+        $query="SELECT * FROM  (SELECT @primid_lp:=:fk_lp) alias,kardex_producto;";
+        $statement = $this->db->prepare($query);
+        $statement->bindParam(":fk_lp",$this->fk_lp, PDO::PARAM_INT);
+        $statement->execute();
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    function consultarClave(){
+        
+        $query = "CALL searchItem(:clave,:folio)";
+
+        $statement = $this->db->prepare($query);
+        $statement->bindParam(":clave",$this->clave,PDO::PARAM_STR);
+        $statement->bindParam(":folio",$this->folio,PDO::PARAM_STR);
+        
+        //echo"CALL searchItem($this->clave,$this->folio)";
+
+        $statement->execute();
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    function getCount()
+    {
+        $query = "SELECT COUNT(clave) as counts FROM producto where estado='Activo'";
+        $statement = $this->db->prepare($query);
+        $statement->execute();
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    function catalogo() {
+        // $query = "SELECT * FROM (SELECT @primid_lp :={:listaPrecios} ID_LP, @primid_clave :='{:clavee}' PRODUCT) ALIAS, CATALOGO_1;"; 
+        $query = "SELECT * FROM (SELECT @primid_lp :=:listaPrecios ID_LP, @primid_clave :=:clavee PRODUCT) ALIAS, CATALOGO_1;"; 
+        $statement = $this->db->prepare($query);
+        $statement->bindParam(":listaPrecios",$this->fk_lp,PDO::PARAM_INT);
+        $statement->bindParam(":clavee",$this->clave,pdo::PARAM_STR);
+        // echo"SELECT * FROM (SELECT @primid_lp :={$this->fk_lp} ID_LP, @primid_clave :='{$this->clave}' PRODUCT) ALIAS, CATALOGO_1;";
+        $statement->execute();
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    function agregarItem(){
+        try {        
+            $query = "CALL ADD_ITEM_INVOICE(:vendedor,:clave,:descripcion,:precio,:cantidad,:cliente,:pedido,:total,
+            :folio,:restrinccion,:ofertaGrupo,:estatusOferta,:listaPrecio,:documento)";
+            
+            $statement = $this->db->prepare($query);
+
+            $statement->bindParam(":vendedor",$this->vendedor);
+            $statement->bindParam(":clave",$this->clave);
+            $statement->bindParam(":descripcion",$this->descripcion);
+            $statement->bindParam(":precio",$this->precio);
+            $statement->bindParam(":cantidad",$this->cantidad);
+            $statement->bindParam(":cliente",$this->cliente);
+            $statement->bindParam(":pedido",$this->pedido);
+            $statement->bindParam(":total",$this->total);
+            $statement->bindParam(":folio",$this->folio);
+            $statement->bindParam(":restrinccion",$this->restrinccion);
+            $statement->bindParam(":ofertaGrupo",$this->oferta);
+            $statement->bindParam(":estatusOferta",$this->estatusOferta);
+            $statement->bindParam(":listaPrecio",$this->fk_lp);
+            $statement->bindParam(":documento",$this->documento);
+
+        
+            // echo "CALL ADD_ITEM_INVOICE($this->vendedor,'$this->clave','$this->descripcion',$this->precio,$this->cantidad,$this->cliente,$this->pedido,$this->total,
+            // '$this->folio','$this->restrinccion',$this->oferta,'$this->estatusOferta',$this->fk_lp,'$this->documento')";
+        
+            $statement->execute();
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        } catch (PDOException $e) {
+            $this->msg_err_Esq = $e->getMessage();
+            return $e->getMessage();
+        }
+        
     }
 
 }

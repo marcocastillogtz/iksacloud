@@ -33,9 +33,12 @@
         private $motivoDevolucion;
         private $fechaDevolucion;
         private $msg_err_Esq;
+        private $total;
 
         protected $db;
-
+        
+        // fam_oferta
+        // estatus_oferta
 
         public function __construct()
         {
@@ -180,7 +183,22 @@
             return $this->folioDevolucion;
         }
 
+
+        function setTotal($totall){
+            $this->total = $totall;
+        }
+        function getTotal(){
+            return $this->total;
+        }
         
+        function setPaquete($paquete) {
+            $this->paquete = $paquete;
+        }
+        function getPaquete(){
+            return $this->paquete;
+        }
+        
+
         function showOrder() {
             $query="SELECT ID,CLAVE,DESCRIPCION,PRECIO,CANTIDAD,MONTO,ESTATUS_OFERTA FROM DETALLE_PEDIDO 
             WHERE ID_DETALLE=:idDetalle ORDER BY ID DESC;";
@@ -296,4 +314,184 @@
             return $statement->execute();
         }
 
+        function insertPartidaAdd(){
+            // $query = "CALL ADD_ITEM_BACKORDER({$var_vendedor},:clavee,:descripcion,:precio,:cantidad,'{$var_cliente}', {$idPedido},{$var_total},:restrinccion,{$var_ofertaGrupo},'{$var_statusOferta}',{$var_listaPrecio}, '{$var_documento}',:folio);"; 
+            
+            $query = "CALL ADD_ITEM_BACKORDER(:folio,:clave,:cantidad,:desc,:precio,:restrinccion,:estatusOferta,:famOferta,:total,:idDetalle);"; 
+            
+            //echo "CALL ADD_ITEM_BACKORDER('$this->folio','$this->clave',$this->cantidad,'$this->descripcion',$this->precio,$this->restrinccion,'$this->estatusOferta',$this->famOferta,$this->total,$this->id);"; 
+            
+            
+            $statement = $this->db->prepare($query);
+            $statement->bindParam(":idDetalle",$this->id);
+            $statement->bindParam(":folio",$this->folio);
+            $statement->bindParam(":clave",$this->clave);
+            $statement->bindParam(":cantidad",$this->cantidad);
+            $statement->bindParam(":desc",$this->descripcion);
+            $statement->bindParam(":precio",$this->precio);
+            $statement->bindParam(":restrinccion",$this->restrinccion);
+            $statement->bindParam(":estatusOferta",$this->estatusOferta);
+            $statement->bindParam(":famOferta",$this->famOferta);
+            $statement->bindParam(":total",$this->total);
+            
+            $statement->execute();
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+            
+        }
+
+        function getOrderByFolioCheckout() {
+            // $searchOrders="SELECT * FROM DETALLE_PEDIDO WHERE FOLIO='$serial';";
+            $query = "SELECT * FROM detalle_pedido WHERE folio = :idd";
+            $statement = $this->db->prepare($query);
+            $statement->bindParam(":idd",$this->id);
+
+            $statement->execute();
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+            
+        }
+
+        function seeKey()  {
+                $query =  "CALL COUNT_ITEM(:folio,:clave,:paquete)";
+                $statement = $this->db->prepare($query);
+                $statement->bindParam(":folio",$this->folio,PDO::PARAM_STR);
+                $statement->bindParam(":clave",$this->clave,PDO::PARAM_STR);
+                $statement->bindParam(":paquete",$this->paquete);
+
+                // echo"CALL COUNT_ITEM('$this->folio','$this->clave',$this->paquete)";
+                $statement->execute();
+                return $statement->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        function getExistenciaProducto(){
+            $query = "SELECT VENDEDOR,PRECIOLISTA,FOLIO FROM DETALLE_PEDIDO WHERE ID_DETALLE=:idDetalle LIMIT 1";
+            $statement = $this->db->prepare($query);
+            $statement->bindParam(":idDetalle",$this->id_detalle);
+
+            // echo"SELECT VENDEDOR,PRECIOLISTA,FOLIO FROM DETALLE_PEDIDO WHERE ID_DETALLE=$this->id_detalle LIMIT 1";
+            $statement->execute();
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        
+
+        function executeDevolucion() {
+            $notify = 0;
+            $agregados = 0;
+            $cantidad = 0;
+            //getInformation
+        
+            $query = "SELECT cantidad,agregados,estatus FROM detalle_pedido WHERE clave =:clave AND folio =:folio";
+            $statement =  $this->db->prepare($query);
+            $statement->bindParam(":folio",$this->folio);
+            $statement->bindParam(":clave",$this->clave);
+            // $statement->bindParam(":cantidad",$this->cantidad);
+
+            $statement->execute();
+            // return $statement->fetchAll(PDO::FETCH_ASSOC);
+            // $valorcitos = $statement->fetchAll(PDO::FETCH_CLASS);
+            $valorcitos = $statement->fetchAll(PDO::FETCH_ASSOC);
+            // var_dump($valorcitos);
+
+            foreach ($valorcitos as $row) {
+                // $cantidadd = $row['cantidad'];
+                // $agregadoss = $row['agregados'];
+                // $estatuss = $row['estatus'];
+                if ($row['estatus'] == "AG") {
+                    $cantidad =  $row['cantidad'] - $this->cantidad;
+                    $agregados = 0;
+                    $notify = 2;
+                } else {
+                    $cantidad = $row['cantidad'] + $this->cantidad;
+                    $agregados = $row['agregados'] - $this->cantidad;
+                    $notify = 1;
+                }
+                
+               
+            }
+        //     function updateDevolucion($cant,$agreg,$not){
+        //         echo 'esta es la cantidad'.$cant.'<br>';
+        //         echo 'esto son los agregados'.$agreg.'<br>';
+        //         echo 'esta es la noficacion'.$not.'<br>';
+    
+        //    }
+        //     updateDevolucion($cantidad,$agregados,$notify);
+
+            if ($notify == 1) {
+                if ($agregados <= -1) {
+                    return 2;
+                } else {
+                    try {
+                        if ($notify == 1) {
+                            $update_222 = "UPDATE detalle_pedido SET agregados = :ag, cantidad = :cant WHERE folio=:folio AND clave = :clave;";
+                            // echo"UPDATE detalle_pedido SET agregados = :ag, cantidad = :cant WHERE folio=:folio AND clave = :clave;";
+                        } else {
+                            $update_222 = "UPDATE detalle_pedido SET agregados = :ag, cantidad = :cant WHERE folio=:folio  AND clave = :clave;";
+                            // echo"UPDATE detalle_pedido SET agregados = :ag, cantidad = :cant WHERE folio=:folio  AND clave = :clave;";
+                        }
+                        
+                        // echo "UPDATE detalle_pedido SET agregados = $agregados, cantidad = $cantidad WHERE folio=$this->folio  AND clave = $this->clave";
+                        $statement_2 = $this->db->prepare($update_222);
+                        $statement_2->bindParam(":cant",$cantidad,PDO::PARAM_INT);
+                        $statement_2->bindParam(":ag",$agregados,PDO::PARAM_INT);
+                        $statement_2->bindParam(":folio",$this->folio,PDO::PARAM_STR);
+                        $statement_2->bindParam(":clave",$this->clave,PDO::PARAM_STR);
+                        // var_dump($statement_2-> execute());
+                        $statement_2->execute();
+                        return 1;
+                    }catch (PDOException $e) {
+                        // echo $e;
+                        return 0;
+                    }
+
+                }
+                
+            } else {
+                if ($agregados <= -1) {
+                    return 2;
+                    //echo'testt 2';
+                } else {
+                    try {
+                        
+                        if ($notify == 2) {
+                            $query ="UPDATE detalle_pedido SET cantidad = $cantidad WHERE folio = '$this->folio' AND clave = '$this->clave';";
+                            // echo"UPDATE detalle_pedido SET cantidad = $cantidad WHERE folio = '$this->folio' AND clave = '$this->clave';";
+
+                        } elseif($notify == 1){
+                            $query = "UPDATE detalle_pedido SET agregados = $agregados where folio = '$this->folio' AND clave = '$this->clave' ";
+                            // echo"UPDATE detalle_pedido SET agregados = $agregados where folio = $this->folio AND clave = $this->clave";
+
+                        }else {
+                            $query = "UPDATE detalle_pedido SET agregados = $agregados, cantidad = $cantidad WHERE folio = '$this->folio' AND clave = '$this->clave' ";
+                            // echo"UPDATE detalle_pedido SET agregados = $agregados, cantidad = $cantidad WHERE folio = $this->folio AND clave= $this->clave";
+                        }
+
+                        
+                        $statement = $this->db->prepare($query);
+                        $statement->execute();
+
+                        return 1;
+
+                    } catch (PDOException $e) {
+                        return 0;
+                    }
+                }
+                
+            }
+        
+            
+        }
+
+        
+
+        function getInfoOrder(){
+            $query ="SELECT vendedor,precioLista,folio FROM detalle_pedido WHERE id_detalle = :idDetalle LIMIT 1";
+            $statement = $this->db->prepare($query);
+            $statement->bindParam(":idDetalle",$this->id_detalle);
+            
+            // echo"SELECT vendedor,precioLista,folio FROM detalle_pedido WHERE id_detalle = $this->id_detalle LIMIT 1";
+
+            $statement->execute();
+            return $statement->fetchAll(PDO::FETCH_ASSOC);
+            
+        }
     }

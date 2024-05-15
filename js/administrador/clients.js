@@ -205,7 +205,7 @@ function crudClientes(array, action) {
                     } else {
                         resolve(resultdata.message + ',' + resultdata.validation)
                     }
-                    1
+                    // 1
                 })
 
                 if (action == "read") {
@@ -257,7 +257,7 @@ function getData() {
     } else {
         data.push("0")
     }
-    data.push($('#select_Banco_client').val())
+    data.push($('#bancos_select').val())
     data.push($('#txt_cuenta_cliente').val())
     data.push($('#txt_limite_dias').val())
     data.push($('#txt_limite_credito').val())
@@ -318,37 +318,89 @@ function setData() {
     data = [];
     accion = "update";
 }
-
 function resetFormCte() {
 
     $('#idCliente').val("")
+    $('#idCliente').removeClass("is-valid");
+
     $('#estatus_select_client').val("Activo")
+    $('#estatus_select_client').removeClass("is-valid");
+
     $('#txt_nombre_cliente').val("")
+    $('#txt_nombre_cliente').removeClass("is-valid");
+
     $('#txt_telefono').val("")
+    $('#txt_telefono').removeClass("is-valid");
+
     $('#txt_email').val("")
+    $('#txt_email').removeClass("is-valid");
+
     $('#estados_select').val("0")
+    $('#estados_select').removeClass("is-valid");
+
     $('#municipio_select').empty()
     $('#municipio_select').prop('disabled', true)
+    $('#municipio_select').removeClass("is-valid");
+
     $('#poblacion_select').empty()
     $('#poblacion_select').prop('disabled', true)
+    $('#poblacion_select').removeClass("is-valid");
+
     $('#clasificacion_select').val("0")
+    $('#clasificacion_select').removeClass("is-valid");
+
     $('#txt_texto').val("")
+    $('#txt_texto').removeClass("is-valid");
+
     $('#select_mdv').val("0")
+    $('#select_mdv').removeClass("is-valid");
+
     $('#select_lp_remision').val("0")
+    $('#select_lp_remision').removeClass("is-valid");
+
     $('#select_lp_factura').val("0")
+    $('#select_lp_factura').removeClass("is-valid");
+
     $('#select_com_remision').val("0")
+    $('#select_com_remision').removeClass("is-valid");
+
     $('#select_com_factura').val("0")
+    $('#select_com_factura').removeClass("is-valid");
+
     $('#txt_rfc').val("")
+    $('#txt_rfc').removeClass("is-valid");
+
     $('#select_mdp').val("0")
+    $('#select_mdp').removeClass("is-valid");
+
     $('#select_cfdi').val("0")
+    $('#select_cfdi').removeClass("is-valid");
+
     $('#select_lp_alterna').val("0")
+    $('#select_lp_alterna').removeClass("is-valid");
+
     $('#check_lpa').is(":checked")
+    $('#check_lpa').removeClass("is-valid");
+
     $('#check_doc_fiscal').is(":checked")
+    $('#check_doc_fiscal').removeClass("is-valid");
+
     $('#check_auth').is(":checked")
+    $('#check_auth').removeClass("is-valid");
+
     $('#select_Banco_client').val("")
+    $('#select_Banco_client').removeClass("is-valid");
+
     $('#txt_cuenta_cliente').val("")
+    $('#txt_cuenta_cliente').removeClass("is-valid");
+
     $('#txt_limite_dias').val("")
+    $('#txt_limite_dias').removeClass("is-valid");
+
     $('#txt_limite_credito').val("")
+    $('#txt_limite_credito').removeClass("is-valid");
+
+
     data = [];
 
 }
@@ -423,7 +475,7 @@ function crudCatalogos(array, action) {
                                         </tr>`;
                                     }
                                 });
-                                resultdata.pages.forEach((info_page) =>{
+                                resultdata.pages.forEach((info_page) => {
                                     pagination += `<li class="page-item ${info_page.active}"><a class="page-link" href="#" data-page="${info_page.page}" taskPag="TskregFiscal">${info_page.page}</a></li>`;
                                 })
                                 resolve(resultdata.message + ',' + resultdata.validation);
@@ -678,7 +730,7 @@ function crudEsquema(array, action) {
                             </tr>`;
                             currentPage = 1;
                             resolve(resultdata.message + ',' + resultdata.validation)
-                        } else { 
+                        } else {
                             if (resultdata.action == "read") {
                                 resultdata.table.forEach((table) => {
                                     if (table.validation == 1) {
@@ -743,7 +795,7 @@ function crudEsquema(array, action) {
                 reject(txtStatus)
             }
         });
-    }) 
+    })
 }
 
 function setDataEsquema() {
@@ -759,7 +811,7 @@ function setDataEsquema() {
     } else {
         $('#select_estatusEsq option[value="1"]').html('Activo').prop('selected', false);
     }
-    
+
     $('#select_estatusEsq').val()
     $('#input_tipoEsq').val(data[7])
     $('#input_tipoEsq').prop("disabled", true);
@@ -815,34 +867,256 @@ $('#clasificacion_select').on('change', function () {
 });
 
 $('#btnSaveCte').on('click', function () {
-    alert($('#exampleFormControlInput1').val())
 
-    /*showLoadButton()
-    crudClientes(getData(), accion).then((result) => { accion ="update";
-        var spt = result.split(",");
-        response_err = spt[1];
-        if (spt[1] == 1) {
-            arrToast.push(spt[0]);
-            arrToast.push(icon_success)
-            showToastCte(arrToast);
-            // alert(spt[0]);
-            hiddeLoadButton();
-            showCaseButton();
-            $('#staticBackdropClient').modal('hide');
-            resetFormCte();
-        } else {
-            arrToast.push(spt[0]);
-            arrToast.push(icon_error)
-            showToastCte(arrToast);
-            showCaseButton();
-        }
+    if (ValidateForms() == 0) {
+        showLoadButton()
+        crudClientes(getData(), accion).then((result) => {
+            accion = "update";
+            var spt = result.split(",");
+            response_err = spt[1];
+            if (spt[1] == 1) {
+                arrToast.push(spt[0]);
+                arrToast.push(icon_success)
+                showToastCte(arrToast);
+                // alert(spt[0]);
+                hiddeLoadButton();
+                showCaseButton();
+                $('#staticBackdropClient').modal('hide');
+                resetFormCte();
+            } else {
+                arrToast.push(spt[0]);
+                arrToast.push(icon_error)
+                showToastCte(arrToast);
+                showCaseButton();
+            }
 
-        data = [];
-    }).catch((err) => {
-        salert(err)
-    });*/
+            data = [];
+        }).catch((err) => {
+            salert(err)
+        });
+    }
 })
 
+
+function ValidateForms() {
+    let contador = 0;
+
+    if ($('#idCliente').val().trim().length == 0) {
+        $('#idCliente').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#idCliente').removeClass("is-invalid");
+        $('#idCliente').addClass("is-valid");
+    }
+
+    if ($('#estatus_select_client').val() == "none") {
+        $('#estatus_select_client').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#estatus_select_client').removeClass("is-invalid");
+        $('#estatus_select_client').addClass("is-valid");
+    }
+
+    if ($('#txt_nombre_cliente').val().trim().length == 0) {
+        $('#txt_nombre_cliente').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#txt_nombre_cliente').removeClass("is-invalid");
+        $('#txt_nombre_cliente').addClass("is-valid");
+    }
+
+
+    if ($('#txt_rfc').val().trim().length == 0) {
+        $('#txt_rfc').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#txt_rfc').removeClass("is-invalid");
+        $('#txt_rfc').addClass("is-valid");
+    }
+
+
+
+    if ($('#clasificacion_select').val() == "0") {
+        $('#clasificacion_select').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#clasificacion_select').removeClass("is-invalid");
+        $('#clasificacion_select').addClass("is-valid");
+    }
+
+
+    if ($('#estados_select').val() == null) {
+        $('#estados_select').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#estados_select').removeClass("is-invalid");
+        $('#estados_select').addClass("is-valid");
+    }
+
+    if ($('#txt_telefono').val().trim().length == 0) {
+        $('#txt_telefono').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#txt_telefono').removeClass("is-invalid");
+        $('#txt_telefono').addClass("is-valid");
+    }
+
+
+    if ($('#select_mdv').val() == "0") {
+        $('#select_mdv').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#select_mdv').removeClass("is-invalid");
+        $('#select_mdv').addClass("is-valid");
+    }
+
+
+    if ($('#select_lp_remision').val() == "0") {
+        $('#select_lp_remision').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#select_lp_remision').removeClass("is-invalid");
+        $('#select_lp_remision').addClass("is-valid");
+    }
+
+    if ($('#select_lp_factura').val() == "0") {
+        $('#select_lp_factura').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#select_lp_factura').removeClass("is-invalid");
+        $('#select_lp_factura').addClass("is-valid");
+    }
+
+    if ($('#select_com_remision').val() == "0") {
+        $('#select_com_remision').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#select_com_remision').removeClass("is-invalid");
+        $('#select_com_remision').addClass("is-valid");
+    }
+
+    if ($('#select_com_factura').val() == "0") {
+        $('#select_com_factura').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#select_com_factura').removeClass("is-invalid");
+        $('#select_com_factura').addClass("is-valid");
+    }
+
+    if ($('#select_mdp').val() == "0") {
+        $('#select_mdp').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#select_mdp').removeClass("is-invalid");
+        $('#select_mdp').addClass("is-valid");
+    }
+
+
+    if ($('#select_mdp').val() == "0") {
+        $('#select_mdp').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#select_mdp').removeClass("is-invalid");
+        $('#select_mdp').addClass("is-valid");
+    }
+
+    if ($('#select_cfdi').val() == "0") {
+        $('#select_cfdi').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#select_cfdi').removeClass("is-invalid");
+        $('#select_cfdi').addClass("is-valid");
+    }
+
+    if ($('#bancos_select').val() == null) {
+        $('#bancos_select').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#bancos_select').removeClass("is-invalid");
+        $('#bancos_select').addClass("is-valid");
+    }
+
+    if ($('#txt_cuenta_cliente').val().trim().length == 0) {
+        $('#txt_cuenta_cliente').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#txt_cuenta_cliente').removeClass("is-invalid");
+        $('#txt_cuenta_cliente').addClass("is-valid");
+    }
+
+
+    
+    if ($('#cb_ddc').prop('checked')) {
+        if ($('#txt_limite_dias').val().trim().length == 0) {
+            $('#txt_limite_dias').addClass("is-invalid");
+            contador++;
+        } else {
+            $('#txt_limite_dias').removeClass("is-invalid");
+            $('#txt_limite_credito').addClass("is-valid");
+        }
+
+        if ($('#txt_limite_credito').val().trim().length == 0) {
+            $('#txt_limite_credito').addClass("is-invalid");
+            contador++;
+        } else {
+            $('#txt_limite_credito').removeClass("is-invalid");
+            $('#txt_limite_dias').addClass("is-valid");
+        }
+    }
+
+
+    if ($('#cb_enviar_correo').prop('checked')) {
+        if ($('#txt_email').val().trim().length == 0) {
+            $('#txt_email').addClass("is-invalid");
+            contador++;
+        } else {
+            $('#txt_email').removeClass("is-invalid");
+            $('#txt_email').addClass("is-valid");
+        }
+    }
+
+   
+
+    if ($('#select_lp_alterna').val() == "0") {
+        $('#select_lp_alterna').addClass("is-invalid");
+        contador++;
+    } else {
+        $('#select_lp_alterna').removeClass("is-invalid");
+        $('#select_lp_alterna').addClass("is-valid");
+    }
+
+
+    return contador
+}
+
+$('#cb_ddc').change(function () {
+    if ($(this).is(':checked')) {
+        $('#txt_limite_dias').prop('disabled', false);
+        $('#txt_limite_credito').prop('disabled', false);
+        $('#txt_limite_dias').val("");
+        $('#txt_limite_credito').val("");
+    } else {
+        $('#txt_limite_dias').prop('disabled', true);
+        $('#txt_limite_credito').prop('disabled', true);
+        $('#txt_limite_dias').val("0");
+        $('#txt_limite_credito').val("0.00");
+        $('#txt_limite_dias').removeClass("is-invalid");
+        $('#txt_limite_credito').removeClass("is-invalid");
+
+    }
+});
+
+
+$('#cb_enviar_correo').change(function () {
+    if ($(this).is(':checked')){
+        $('#txt_email').prop('disabled', false);
+        $('#txt_email').val("");
+    }else{
+        $('#txt_email').prop('disabled', true);
+        $('#txt_email').removeClass("is-invalid");
+        $('#txt_email').val("sin correo");
+    }
+});
 
 $('#btnTableClient').on('click', function () {
     data.push(currentPage);
@@ -874,20 +1148,20 @@ $(document).on('click', '.pagination a', function (event) {
     if (typePagination == "Tskclientes") {
         crudClientes(data, "read").then((page) => {
             if (page == 1) {
-    
+
             }
             data = []
         }).catch((err) => {
             alert(err);
-        }); 
-    }else if(typePagination == "Tskcfdi"){
+        });
+    } else if (typePagination == "Tskcfdi") {
         crudCatalogos(data, "read_cfdi").then((result) => {
             var message = result.split(",");
-            if(message[1]==1){
+            if (message[1] == 1) {
                 arrToast.push(message[0]);
                 arrToast.push(icon_success);
                 showToastCte(arrToast);
-            }else{
+            } else {
                 arrToast.push("No se pudo mostrar los datos");
                 arrToast.push(icon_error);
                 showToastCte(arrToast);
@@ -896,14 +1170,14 @@ $(document).on('click', '.pagination a', function (event) {
         }).catch((err) => {
             alert(err);
         });
-    }else if(typePagination == "TskregFiscal"){
+    } else if (typePagination == "TskregFiscal") {
         crudCatalogos(data, "read").then((result) => {
             var message = result.split(",");
-            if(message[1]==1){
+            if (message[1] == 1) {
                 arrToast.push(message[0]);
                 arrToast.push(icon_success);
                 showToastCte(arrToast);
-            }else{
+            } else {
                 arrToast.push("No se pudo mostrar los datos");
                 arrToast.push(icon_error);
                 showToastCte(arrToast);
@@ -912,14 +1186,14 @@ $(document).on('click', '.pagination a', function (event) {
         }).catch((err) => {
             alert(err);
         });
-    }else if(typePagination == "TskformSAT"){
+    } else if (typePagination == "TskformSAT") {
         crudCatalogos(data, "read_sat").then((result) => {
             var message = result.split(",");
-            if(message[1]==1){
+            if (message[1] == 1) {
                 arrToast.push(message[0]);
                 arrToast.push(icon_success);
                 showToastCte(arrToast);
-            }else{
+            } else {
                 arrToast.push("No se pudo mostrar los datos");
                 arrToast.push(icon_error);
                 showToastCte(arrToast);
@@ -928,14 +1202,14 @@ $(document).on('click', '.pagination a', function (event) {
         }).catch((err) => {
             alert(err);
         });
-    }else if(typePagination == "TskmetVenta"){
+    } else if (typePagination == "TskmetVenta") {
         crudMetodoVenta(data, "read").then((result) => {
             var message = result.split(",");
-            if(message[1]==1){
+            if (message[1] == 1) {
                 arrToast.push(message[0]);
                 arrToast.push(icon_success);
                 showToastCte(arrToast);
-            }else{
+            } else {
                 arrToast.push("No se pudo mostrar los datos");
                 arrToast.push(icon_error);
                 showToastCte(arrToast);
@@ -944,14 +1218,14 @@ $(document).on('click', '.pagination a', function (event) {
         }).catch((err) => {
             alert(err);
         });
-    }else if(typePagination == "Tskesquema"){
+    } else if (typePagination == "Tskesquema") {
         crudEsquema(data, "read").then((result) => {
             var message = result.split(",");
-            if(message[1]==1){
+            if (message[1] == 1) {
                 arrToast.push(message[0]);
                 arrToast.push(icon_success);
                 showToastCte(arrToast);
-            }else{
+            } else {
                 arrToast.push("No se pudo mostrar los datos");
                 arrToast.push(icon_error);
                 showToastCte(arrToast);
@@ -975,6 +1249,7 @@ $(document).on("click", "#btnEditCte", function () {
 
     crudClientes(data, "read_id").then((result) => {
         setData();
+        accion = "update";
     }).catch((err) => {
         alert(err);
     })
@@ -994,7 +1269,7 @@ $(document).on('click', '#btnCloseCte', function () {
 })
 
 $('#btnModalCte').on('click', '#btnModalCte', function () {
-
+    accion = "insert";
 })
 
 $('#check_doc_fiscal').change(function () {
@@ -1065,10 +1340,10 @@ $('#btnTableRegimen').on('click', function () {
     data.push(currentPage);
     data.push(itemsPerPage);
     crudCatalogos(data, "read").then((result) => {
-    // crudCatalogos([""], "read").then((result) => {
+        // crudCatalogos([""], "read").then((result) => {
         var spt = result.split(",");
         if (spt[1 == 1]) {
-            
+
         } else {
 
         }
@@ -1303,7 +1578,7 @@ $('#btnTableMetVenta').on('click', function () {
     data.push(currentPage);
     data.push(itemsPerPage);
     crudMetodoVenta(data, "read").then((result) => {
-    // crudMetodoVenta([""], "read").then((result) => {
+        // crudMetodoVenta([""], "read").then((result) => {
         var spt = result.split(",");
         if (spt[1 == 1]) {
 
@@ -1532,7 +1807,7 @@ $('#btnTableFormSAT').on('click', function () {
     data.push(currentPage);
     data.push(itemsPerPage);
     crudCatalogos(data, "read_sat").then((result) => {
-    // crudCatalogos([""], "read_sat").then((result) => {
+        // crudCatalogos([""], "read_sat").then((result) => {
         var spt = result.split(",");
         if (spt[1 == 1]) {
 
@@ -1722,7 +1997,7 @@ $('#btnTableCFDI').on('click', function () {
     crudCatalogos(data, "read_cfdi").then((result) => {
         var spt = result.split(",");
         if (spt[1 == 1]) {
-            
+
         } else {
 
         }
@@ -1909,7 +2184,7 @@ $('#btnTableEsquema').on('click', function () {
     crudEsquema(data, "read").then((result) => {
         var spt = result.split(",");
         if (spt[1 == 1]) {
-            
+
         } else {
 
         }
@@ -1941,7 +2216,7 @@ $(document).on('click', '#btnGuardarEsquema', function () {
     let comEsq = $("#input_comisionEsq").val();
     let precEsq = $("#input_PListaEsq").val();
     let idEsq = idEsquema;
-    
+
 
     let textcomEsq = $.trim($("#input_comisionEsq").val());
     let textprecEsq = $.trim($("#input_PListaEsq").val());
@@ -1968,7 +2243,7 @@ $(document).on('click', '#btnGuardarEsquema', function () {
         data.push(precEsq);
         data.push(estEsq);
         data.push(comEsq);
-        
+
         crudEsquema(data, "update").then((result) => {
             var spt = result.split(",");
             console.log(data);
@@ -2037,17 +2312,17 @@ $('#btnBuscarEsqDoc').on('click', function () {
     if (val == 2) {
         data.push(cliEsq);
         data.push(docuEsq);
-    
+
         crudEsquema(data, "read_doc").then((result) => {
             var spt = result.split(",");
             if (spt[1 == 1]) {
                 $("#select_clienteEsq").addClass("border border-success");
-            $("#select_documentoEsq").addClass("border border-success");
+                $("#select_documentoEsq").addClass("border border-success");
             } else {
-                
+
             }
             data = []
-            
+
         }).catch((err) => {
             alert(err)
             response_err = 404;

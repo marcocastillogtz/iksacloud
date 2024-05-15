@@ -7,6 +7,9 @@ if (isset($_GET['arrData'])) {
         require_once("../../entidades/DetallePedido.php");
         $DetallePedido = new DetallePedido; 
 
+        require_once("../../entidades/Producto.php");
+        $Producto = new Producto;
+
         $response = "";
         $data = $_GET['arrData'];
         if ($data[0] == "showOrderBack") {
@@ -27,6 +30,10 @@ if (isset($_GET['arrData'])) {
             $response = resetDetallePed($DetallePedido);
         }else if($data[0] == "eliminarPartidaBackOrder"){
             $response = eliminarPartidaBackOrder($DetallePedido);
+        }else if($data[0] == "insertPartidaAdd"){
+            $response = insertPartidaAdd($DetallePedido);
+        }else if($data[0] == "consultarClave"){
+            $response = consultarClave($Producto);
         }
         
         else{
@@ -38,6 +45,83 @@ if (isset($_GET['arrData'])) {
     $response = null;
     $response[] = array('action' => 'none', 'validation' => 404, 'message' => 'No se recibieron parametros.');
     echo json_encode($response);
+}
+
+function consultarClave($Producto){
+    $json = null;
+    $data = $_GET['arrData'];
+    $Producto->setClave($data[1]);
+    $Producto->setFolio($data[2]);
+    $moduleData = $Producto->consultarClave();
+
+    // var_dump($moduleData);
+    if ($moduleData) {
+        foreach ($moduleData as $row) {
+            $json[] = array(
+                'validation' => 1,
+                'clave'=>$row['CLAVE'],
+                'descripcion'=>$row['DESCRIPCION'],
+                'precio'=>$row['PRECIO'],
+                'precioEspecial'=>$row['PRICE_SPECIAL'],
+                'familiaVenta'=>$row['FAME_SALE'],
+                'precioVenta'=>$row['PRICE_SALE'],
+                'restriccion'=>$row['RESTRICCION']
+            );
+        }
+    } else {
+        $json[] = array(
+            'validation' => 0,
+            'message' => 'Sin Resultado'
+        );
+    }
+    return $json;
+
+}
+
+function insertPartidaAdd($DetallePedido){
+    $json = null;
+    $data = $_GET['arrData'];
+    $DetallePedido->setId($data[1]);
+    $DetallePedido->setFolio($data[2]);
+    $DetallePedido->setClave($data[3]);
+    $DetallePedido->setCantidad($data[4]);
+    $DetallePedido->setDescripcion($data[5]);
+    $DetallePedido->setPrecio($data[6]);
+    $DetallePedido->setRestrinccion($data[7]);
+    $DetallePedido->setEstatusOferta($data[8]);
+    $DetallePedido->setFamOferta($data[9]);
+    $DetallePedido->setTotal($data[10]);
+    
+    /*
+    echo"id..".$data[1]."<br>";
+    echo"folio..".$data[2]."<br>";
+    echo"clave..".$data[3]."<br>";
+    echo"cantidad..".$data[4]."<br>";
+    echo"descripcion..".$data[5]."<br>";
+    echo"precio..".$data[6]."<br>";
+    echo"oferta..".$data[7]."<br>";
+    echo"restrinccion..".$data[8]."<br>";
+    echo"familiaOferta..".$data[9]."<br>";
+    echo"total..".$data[10]."<br>";
+    */
+
+
+    $moduleData = $DetallePedido->insertPartidaAdd();
+
+    if ($moduleData) {
+        foreach ($moduleData as $row) {
+            $json[] = array(
+                'validation' => 1,
+                'result' => $row['result']
+            );
+        }
+    } else {
+        $json[] = array(
+            'validation' => 0
+        );
+    }
+    return $json;
+
 }
 
 function eliminarPartidaBackOrder($DetallePedido){

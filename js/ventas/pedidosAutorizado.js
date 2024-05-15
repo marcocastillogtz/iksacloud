@@ -583,7 +583,13 @@ function sentNotify(token, id_order, user) {
 
 // var prioridad = 1;
 
-$('input[type=radio]').change(function (e) {
+// $('input[type=radio]').change(function (e) {
+//     prioridad = $('input:radio[name=btnradio]:checked').val();
+//     let idd = id_order;
+//     getLooterSelected(idd);
+// });
+
+$('input[type=radio][name="btnradio"]').change(function (e) {
     prioridad = $('input:radio[name=btnradio]:checked').val();
     let idd = id_order;
     getLooterSelected(idd);

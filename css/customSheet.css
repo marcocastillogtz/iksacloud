@@ -1,0 +1,19 @@
+.container-custom {
+    width: 35px; /* Ajusta el ancho según tu necesidad */
+    height: 35px; /* Ajusta la altura según tu necesidad */
+    border-radius: 30%; /* Esto crea los bordes circulares */
+    overflow: hidden; /* Esto asegura que la imagen no sobresalga de los bordes circulares */
+    background-color: white; /* Esto establece el fondo blanco */
+  }
+  
+  .container-custom img {
+    width: 100%; /* Esto asegura que la imagen ocupe todo el contenedor */
+    height: auto; /* Esto mantiene la relación de aspecto de la imagen */
+    /* display: block; Esto asegura que la imagen esté alineada correctamente */
+  }
+
+  .hipervinculo {
+    cursor: pointer;
+    text-decoration: none; /* Esto quita la línea de subrayado */
+    color: rgb(167, 167, 167); /* Esto establece el color del texto del hipervínculo */
+  }

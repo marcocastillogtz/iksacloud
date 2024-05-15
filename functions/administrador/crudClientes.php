@@ -89,7 +89,7 @@ function saveClient($Class)
 
 
     if ($Class->saveClient()) {
-        $json[] = array('validation' => 1, 'message' => 'Nuevo dato guardado', 'action' => $_GET['action']);
+        $json[] = array('validation' => 1, 'message' => 'Nuevo dato guardado', 'action' => $_GET['action'], 'data' => $data);
     } else {
         $json[] = array('validation' => 0, 'message' => 'Error al guardar el dato', 'action' => $_GET['action']);
     }
@@ -137,6 +137,7 @@ function getClients($Class)
     if (count($clients) > 0) {
         $data = null;
         $x=1;
+        
         foreach ($clients as $row) {
             $counter = $x++; 
             $data[] = array(

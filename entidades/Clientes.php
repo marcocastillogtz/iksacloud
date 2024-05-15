@@ -455,4 +455,15 @@ class Clientes
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
     
+
+
+    function getClientBySeller(){
+        $query = "SELECT id_cliente,nombre_completo FROM cliente WHERE clasificacion = :clasificacionnn";
+        $statement = $this->db->prepare($query);
+        $statement->bindParam(":clasificacionnn", $this->clasificacion,PDO::PARAM_STR);
+        $statement->execute();
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    }
 }

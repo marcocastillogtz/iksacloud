@@ -18,6 +18,10 @@
     <script src="../../js/ventas/pedidosEspera.js"></script>
     <script src="../../js/ventas/historial.js"></script>
     <script src="../../js/ventas/backOrder.js"></script>
+    <script src="../../js/ventas/seguimiento.js"></script>
+    <script src="../../js/ventas/progresoPedidos.js"></script>
+    <script src="../../js/ventas/pedidoScanLoot.js"></script>
+    <link rel="stylesheet" href="../../css/customSheet.css">
 </head>
 <body>
 
@@ -45,19 +49,25 @@
                     <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="list-historial-list" data-bs-toggle="list" href="#list-historial" role="tab" aria-controls="list-historial">Historial <img src="../../img/iconos/x24/calendario.png" alt=""></a>
                     <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="list-backOrder-list" data-bs-toggle="list" href="#list-backOrder" role="tab" aria-controls="list-backOrder">BackOrder <img src="../../img/iconos/x24/backTime.png" alt=""></a>
                     <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="list-seguimiento-list" data-bs-toggle="list" href="#list-seguimiento" role="tab" aria-controls="list-seguimiento">Seguimiento <img src="../../img/iconos/x24/chat.png" alt=""></a>
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="list-progresoPedidos-list" data-bs-toggle="list" href="#list-progresoPedidos" role="tab" aria-controls="list-progresoPedidos">Progreso de Pedidos <img src="../../img/iconos/x24/caja.png" alt=""></a>
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" id="list-pedidoScanLoot-list" data-bs-toggle="list" href="#list-pedidoScanLoot" role="tab" aria-controls="list-pedidoScanLoot">Pedidos para ScanLoot <img src="../../img/iconos/x24/listaVerificacion.png" alt=""></a>
                 </div>
             </div>
             <div class="col-9">
                 <div class="tab-content" id="nav-tabContent">
-                    <!-- <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list"></div> -->
-                    <div class="tab-pane fade show active" id="list-cotizacion" role="tabpanel" aria-labelledby="list-cotizacion-list"><?php include_once('../ventas/items/cotizacion.php') ?></div>
-                    <div class="tab-pane fade" id="list-pedidosAutorizados" role="tabpanel" aria-labelledby="list-pedidosAutorizados-list"><?php include_once('../ventas/items/pedidosAutorizados.php') ?></div>
-                    <div class="tab-pane fade" id="list-pedidosEspera" role="tabpanel" aria-labelledby="list-pedidosEspera-list"><?php include_once('../ventas/items/pedidosEspera.php') ?></div>
-                    <div class="tab-pane fade" id="list-historial" role="tabpanel" aria-labelledby="list-historial-list"><?php include_once('../ventas/items/historial.php') ?></div>
-                    <div class="tab-pane fade" id="list-backOrder" role="tabpanel" aria-labelledby="list-backOrder-list"><?php include_once('../ventas/items/backOrder.php') ?></div>
-                    <div class="tab-pane fade" id="list-seguimiento" role="tabpanel" aria-labelledby="list-seguimiento-list"><?php include_once('../ventas/items/seguimiento.php') ?></div>
+                    <div class="tab-pane fade show active" id="list-cotizacion" role="tabpanel" aria-labelledby="list-cotizacion-list"><?php include_once('../ventas/items/cotizacion.php'); ?></div>
+                    <div class="tab-pane fade" id="list-pedidosAutorizados" role="tabpanel" aria-labelledby="list-pedidosAutorizados-list"><?php include_once('../ventas/items/pedidosAutorizados.php'); ?></div>
+                    <div class="tab-pane fade" id="list-pedidosEspera" role="tabpanel" aria-labelledby="list-pedidosEspera-list"><?php include_once('../ventas/items/pedidosEspera.php'); ?></div>
+                    <div class="tab-pane fade" id="list-historial" role="tabpanel" aria-labelledby="list-historial-list"><?php include_once('../ventas/items/historial.php'); ?></div>
+                    <div class="tab-pane fade" id="list-backOrder" role="tabpanel" aria-labelledby="list-backOrder-list"><?php include_once('../ventas/items/backOrder.php'); ?></div>
+                    <div class="tab-pane fade" id="list-seguimiento" role="tabpanel" aria-labelledby="list-seguimiento-list"><?php include_once('../ventas/items/seguimiento.php'); ?></div>
+                    
+                    <div class="tab-pane fade" id="list-progresoPedidos" role="tabpanel" aria-labelledby="list-progresoPedidos-list"><?php include_once('../ventas/items/progresoPedidos.php'); ?></div>
+                    <div class="tab-pane fade" id="list-pedidoScanLoot" role="tabpanel" aria-labelledby="list-pedidoScanLoot-list"><?php include_once('../ventas/items/pedidoScanLoot.php'); ?></div>
+
                 </div>
-            </div>
+            </div> 
+
         </div>
     </div>
 </body>

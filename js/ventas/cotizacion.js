@@ -1,47 +1,120 @@
 $(document).ready(function () {
     console.log('Modulo de cotizacion');
+    $("#SpinnerLoad").hide()
+    $("#tableComponentes tr").remove();
+    $('.toast').toast('show');
+    $("#txt_fecha").val(getDate())
+    // disabledInput()
+    enabledInput()
 })
+
+function disabledInput() {
+    $("#txt_clave").prop("disabled", true)
+    $("#btn_search_cve").prop("disabled", true)
+    $("#txt_cantidad").prop("disabled", true)
+    $("#txt_subtotal_2").prop("disabled", true)
+    $("#btnInfoTot").prop("disabled", true)
+}
+
+function enabledInput() {
+    $("#txt_clave").prop("disabled", false)
+    $("#btn_search_cve").prop("disabled", false)
+    $("#txt_cantidad").prop("disabled", false)
+    $("#txt_subtotal_2").prop("disabled", false)
+    $("#btnInfoTot").prop("disabled", false)
+}
+
+
 var delayTimer;
-var arrData=[];
+var arrData = [];
+var innerSpinner = `                        
+<tr>
+<th scope="row" colspan="6">
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</th>
+</tr>`;
+$("#tableComponentes").html(innerSpinner);
 
-$('#txt_idCliente').keyup(function(e) {
-    var c = $("#txt_idCliente").val();
 
-    if (c.length > 0) {
-        $('#spinnerContainer').show()
+$('#txt_idCliente').keyup(function (e) {
+    var cteId = $("#txt_idCliente").val();
+    if (cteId.length > 0) {
+        // $('#spinnerContainer').show()
+        $("#btn_saveData").prop("disabled", true)
+        $("#SpinnerLoad").show()
         clearTimeout(delayTimer)
         delayTimer = setTimeout(() => {
             console.log("Buscando Cliente")
-            buscarCliente(c).then((result) => {
-                if (result == 500) {
-                    alert('No se pudo completar el proceso, intentelo mas tarde');
-                    // $.alert({
-                    //     title: 'Error!',
-                    //     content: "No se pudo completar el proceso, intentelo mas tarde",
-                    // });
-                    $('#spinnerContainer').hide()
+            buscarCliente(cteId).then((response) => {
+                let result = response.split("-");
+                if (result[0] == 0) {
+                    alert(result[1]);
+                    $("#SpinnerLoad").hide()
+                    $("#btn_saveData").prop("disabled", false)
                 } else {
-                    $("#ContainerInformation").removeClass("show");
-                    $('#pNombre').show()
-                    $('#pNombre').html(c + "-" + $('#txt_cliente').val())
-                    $('#spinnerContainer').hide()
+                    var cteName = $("#txt_cliente").val();
+                    $('#pNombre').html("Cte: (" + cteId + ")-" + cteName)
+                    $("#SpinnerLoad").hide()
+                    $("#btn_saveData").prop("disabled", false)
+                    enabledInput()
                 }
             }).catch((error) => {
-                // $.alert({
-                //     title: 'Error!',
-                //     content: error,
-                // });
-                console.log('Error..'+error);
-                $('#spinnerContainer').hide()
+                console.log('Error..' + error);
+                $("#SpinnerLoad").hide()
+                $("#btn_saveData").prop("disabled", false)
             })
         }, 3000);
     }
 
-
 });
 
+
+// document.addEventListener('keydown', function (event) {
+
+//     if (localStorage.getItem("submodule")) {
+//         if (event.key === 'F9') {
+//             $("#txt_fecha").val(getDate());
+//             $('#modalCotizacion_1').modal('show');
+//         }
+//     }else{
+//         alert("Funcion no disposnible para este modulo");
+//     }
+// });
+
+//@Explication: Devuelve la fecha del dia de hoy
+function getDate() {
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1;
+    var yyyy = today.getFullYear();
+
+    dd = addZero(dd);
+    mm = addZero(mm);
+
+    let date = yyyy + '/' + mm + '/' + dd
+    return date;
+}
+//@Explication: Agrega un 0 y los devuelve los numeros siempre y cuando se menores a 10 
+function addZero(i) {
+    if (i < 10) {
+        i = '0' + i;
+        // i+= '0';
+    }
+    return i;
+
+}
+
+
+function mainCotizacion() {
+
+}
+
 function buscarCliente(idCliente) {
-    arrData=[];
+    arrData = [];
     arrData.push('getClients');
     arrData.push(idCliente);
 
@@ -58,6 +131,8 @@ function buscarCliente(idCliente) {
                     let NombreCompleto = customer.Nombre;
                     let listaPrecio = customer.lislista_precio;
                     let codeError = customer.code;
+                    let messageError = customer.message;
+                    let validation = customer.validation;
 
                     if (listaPrecio == 0 || codeError == 400) {
                         alert("No se encontro coincidencias,intentalo de nuevo")
@@ -78,9 +153,9 @@ function buscarCliente(idCliente) {
                             $('#txt_idVendedor').val(customer.id);
                             $('#txt_clave').prop("disabled", false);
                             $('#txt_cantidad').prop("disabled", false);
-                            if(idCliente=='MOSTR'){
+                            if (idCliente == 'MOSTR') {
                                 $('#txt_precioiva').prop("disabled", false);
-                            }else{
+                            } else {
                                 $('#txt_precioiva').prop("disabled", true);
                             }
 
@@ -103,7 +178,7 @@ function buscarCliente(idCliente) {
                                 $('#select_documento').val(customer.doc_alt);
                                 $('#txt_lp').val(customer.lista_precio);
                                 $('#txt_lpDescripcion').val(customer.Descripcion);
-                            } else if (customer.opstandar == 0 ) {
+                            } else if (customer.opstandar == 0) {
                                 if (customer.doc_alt == "Factura") {
                                     $('#select_documento').val(customer.doc_alt);
                                     $('#txt_lp').val(customer.lpa);
@@ -115,15 +190,15 @@ function buscarCliente(idCliente) {
                                 }
                             }
                         }
-                        resolve(1)
+                        resolve(validation + "-" + messageError);
                     }
                 })
 
             },
             error: function (XMLHttpRequest, txtStatus, errorThrown) {
-                alert('Request'+XMLHttpRequest);
-                alert('Estatus'+txtStatus);
-                alert('Error'+errorThrown);
+                alert('Request' + XMLHttpRequest);
+                alert('Estatus' + txtStatus);
+                alert('Error' + errorThrown);
 
                 reject(500);
             }
@@ -137,34 +212,34 @@ function Mayus(key) {
 
 $('#txt_clave').keyup(function (e) {
     var key = $('#txt_clave').val();
-   
+
     clearTimeout(delayTimer);
     delayTimer = setTimeout(() => {
         if (key.length > 8 && key.length < 10) {
-            ConsultarClave(key).then((result)=>{
+            ConsultarClave(key).then((result) => {
                 if (result == 500) {
                     alert('Ocurrio un problema, intentelo mas tarde');
                 }
-            }).catch((error)=>{
+            }).catch((error) => {
                 alert('Ocurrio un problema inesperado :| =>' + error);
             })
         } else {
-            
+
         }
     }, 100);
 })
 
 function ConsultarClave(clave) {
     var lp = $('#txt_lp').val();
-   
-    arrData=[];
+
+    arrData = [];
     arrData.push('consultarClave');
     arrData.push(clave);
     arrData.push(lp);
 
 
     return new Promise(function (resolve, reject) {
-        
+
         $.ajax({
             // url: "../../functions/ventas/cotizacion/searchItem.php",
             url: "../../functions/ventas/mainCotizacion.php",
@@ -254,7 +329,7 @@ $('#txt_cantidad').keyup(function (e) {
                                 //     title: 'Error!',
                                 //     content: error,
                                 // });
-                                alert('Error..'+error);
+                                alert('Error..' + error);
                             })
                         } else {
                             // $.alert({
@@ -338,7 +413,7 @@ $('#txt_cantidad').keyup(function (e) {
                 //     title: 'Mensaje!',
                 //     content: "No se puede agregar un producto inexsitente " + clave,
                 // });
-                alert('No se puede agregar un producto inexistente ' +clave);
+                alert('No se puede agregar un producto inexistente ' + clave);
             }
         } else {
             //alert("El producto consta de 9 caracteres")
@@ -349,7 +424,7 @@ $('#txt_cantidad').keyup(function (e) {
             // });
 
             alert('El producto consta de 9 caracteres');
-            
+
             $("#txt_cantidad").val();
             $("#txt_clave").val();
             $("#txt_clave").focus();
@@ -370,7 +445,7 @@ function Total() {
 
 
 function searchObservacion(id) {
-    arrData=[];
+    arrData = [];
     arrData.push('searchObservacion');
     arrData.push(id);
 
@@ -388,7 +463,7 @@ function searchObservacion(id) {
                 resolve(1)
             },
             error: function (XMLHttpRequest, txtStatus, errorThrown) {
-                alert("Request: "+XMLHttpRequest);
+                alert("Request: " + XMLHttpRequest);
                 alert("Estatus: " + txtStatus);
                 alert("Error: " + errorThrown);
                 reject(500)
@@ -536,7 +611,7 @@ function idOrder() {
         var lp = $('#txt_lp').val();
         var envio = $('#select_envio').val();
 
-        arrData=[];
+        arrData = [];
         arrData.push('getIdOrder');
         arrData.push(cliente);
         arrData.push(vendedor);
@@ -555,7 +630,7 @@ function idOrder() {
             // url: '../../functions/ventas/cotizacion/getIdOrder.php',
             url: "../../functions/ventas/mainCotizacion.php",
             type: 'GET',
-            data: { arrData},
+            data: { arrData },
             success: function (response) {
                 let pedido = JSON.parse(response);
                 console.log(response);
@@ -577,14 +652,14 @@ function idOrder() {
 
 
 function getTotal() {
-    arrData =[];
+    arrData = [];
     let id = $('#txt_idPedido').val();
-    
+
     arrData.push('getTotal');
     arrData.push(id);
 
     return new Promise(function (resolve, reject) {
-        
+
         $.ajax({
             // url: '../../functions/ventas/cotizacion/getTotal.php',
             url: "../../functions/ventas/mainCotizacion.php",
@@ -606,7 +681,7 @@ function getTotal() {
                 });
             },
             error: function (XMLHttpRequest, txtStatus, errorThrown) {
-                alert('Request..'+XMLHttpRequest);
+                alert('Request..' + XMLHttpRequest);
                 alert("Estatus: " + txtStatus);
                 alert("Error: " + errorThrown);
                 reject(0)
@@ -614,3 +689,106 @@ function getTotal() {
         });
     })
 }
+
+
+
+$("#btn_search_cve").on("click", function () {
+    let lista = $("#txt_lp").val();
+    arrData = [];
+    arrData.push('getKardex');
+    arrData.push(lista);
+
+    getKardex().then((result) => {
+
+    }).catch((error) => {
+        alert(error);
+    })
+})
+
+function getKardex() {
+
+    return new Promise(function (resolve, reject) {
+        $.ajax({
+            url: "../../functions/ventas/mainCotizacion.php",
+            type: 'GET',
+            data: { arrData },
+            success: function (response) {
+                let data = JSON.parse(response);
+                let template = '';
+                let pagination = "";
+                data.forEach(item => {
+                    let validation = item.validation;
+
+                    if (validation === 1) {
+                        item.table.forEach(item => {
+                            var precioo = parseFloat(item.precio);
+                            var precioOfertaa = parseFloat(item.precioOferta);
+
+                            if (precioo == 0) {
+                                precioo = "-";
+                            } else {
+                                precioo = precioo.toFixed(2)
+                            }
+
+                            if (precioOfertaa == 0) {
+                                precioOfertaa = "-";
+                            } else {
+                                precioOfertaa = precioOfertaa.toFixed(2)
+                            }
+
+                            template += `
+                        <tr class="align-middle hipervinculo" style="cursor: pointer;" idClave="${item.clave}" id="td_tabledata">
+                            <th class="text-center"><a class="text-primary-emphasis hipervinculo" >${item.clave}</a></th>
+                            <td class="text-center"><div class="container-custom"><img src="${item.imagen}" alt="" width="35" height="35"></div></td>
+                            <td style="max-width: 20rem;"><a class="d-inline-block text-truncate hipervinculo text-secondary-emphasis" style="max-width: 400px;">${item.descripcionn}</a></td>
+                            <td class="text-center"><a class="text-success hipervinculo">${precioo}</a></td>
+                            <td class="text-center"><a>${precioOfertaa}</p></td>
+                            <td class="text-center "><a class="text-success hipervinculo">${item.claveSAT}</a></td>
+                            <td class="text-center"><a class="text-success hipervinculo">${item.claveUnidad}</a></td>
+                        </tr>`
+                        })
+                        item.pages.forEach((info_page) => {
+                            pagination += `<li class="page-item ${info_page.active}"><a class="page-link" href="#" data-page="${info_page.page}" taskPag="TskProducts">${info_page.page}</a></li>`;
+
+                        })
+                    }
+                });
+                resolve(1)
+                $('#tableProducts').html(template);
+                $('#pagination_kardex_products').html(pagination);
+            },
+            error: function (XMLHttpRequest, txtStatus, errorThrown) {
+                alert("Request: " + XMLHttpRequest);
+                alert("Estatus: " + txtStatus);
+                alert("Error: " + errorThrown);
+                reject(500)
+            }
+        });
+    })
+
+}
+
+
+$(document).on('click', '.pagination a', function (event) {
+    arrData = [];
+    event.preventDefault();
+    typePagination = this.getAttribute('taskPag');
+    currentPage = $(this).data('page');
+    arrData.push('getKardex');
+    arrData.push(currentPage);
+
+
+    if (typePagination == "TskProducts") {
+        getKardex().then((result) => {
+
+        }).catch((error) => {
+            alert(error);
+        })
+
+    }
+});
+
+
+$("#td_tabledata").on("click", function () {
+    alert("click");
+})
