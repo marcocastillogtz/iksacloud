@@ -15,9 +15,14 @@
         $id = $_GET['order'];
         $user = $_GET['user'];
         
-        $VAR_HOST = '192.168.0.38';
-        $VAR_USER = 'Marco';
-        $VAR_PASSWORD = 'Cbsu_it2024!';
+        // $VAR_HOST = '192.168.0.38';
+        // $VAR_USER = 'Marco';
+        // $VAR_PASSWORD = 'Cbsu_it2024!';
+        // $VAR_DATABASE = 'iksasocket';
+        
+        $VAR_HOST = 'localhost';
+        $VAR_USER = 'cbsu_IKSA_ROOT';
+        $VAR_PASSWORD = '#Kyc@dmin1st3r23!';
         $VAR_DATABASE = 'iksasocket';
 
 

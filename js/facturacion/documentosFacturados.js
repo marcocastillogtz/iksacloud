@@ -5,7 +5,8 @@ $(document).ready(function () {
     getVendedor();
 });
 
-var servidor = "http://localhost/iksasocket/";
+// var servidor = "http://localhost/iksasocket/";
+var servidor = "https://iksacloud.webipadsa.com/";
 
 function getDocFacturados() {
     arrData = [];

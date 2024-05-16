@@ -1,5 +1,5 @@
 <?php
-require('../entidades/login.php');
+require('../entidades/Login.php');
 session_start();
 $object_login = new Login;
 $object_login->setUsuario($_SESSION['user']);

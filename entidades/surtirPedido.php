@@ -164,7 +164,7 @@
         }
 
         function getPedidoProgress() {
-            $query = "SELECT * FROM SURTIENDO;";
+            $query = "SELECT * FROM surtiendo;";
             $statement = $this->db->prepare($query);
             $statement->execute();
             return $statement->fetchAll(PDO::FETCH_ASSOC);

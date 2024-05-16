@@ -5,9 +5,9 @@ class DataBaseConnection{
 
     public function __construct()
     {
-        $dns='mysql:host=192.168.0.38;dbname=iksasocket';
-        $username='Marco';
-        $password = 'Cbsu_it2024!';
+        $dns='mysql:host=localhost;dbname=iksasocket';
+        $username='cbsu_IKSA_ROOT';
+        $password = '#Kyc@dmin1st3r23!';
         
         /*
         $dns='mysql:host=192.168.0.18;dbname=iksasocket';

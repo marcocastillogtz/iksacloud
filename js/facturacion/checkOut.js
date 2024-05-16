@@ -156,7 +156,7 @@ function getOrderByFolioCheckout(serial) {
                              } else {
                                 template += `
                                 <tr>
-                                    <td class="h5 text-center" style="font-weight: bold;">Sin Resultados :(</td>
+                                    <td class="h5 text-center" style="font-weight: bold;" colspan=4>Sin Resultados :(</td>
                                 <tr>`;
                              }
                              $("#tablePedidoCheckOut").html(template);
@@ -174,6 +174,7 @@ function getOrderByFolioCheckout(serial) {
             if (response == 1) {
                 $("#spinnerTablePedidosCheckOut").hide();
             } else {
+                 $("#spinnerTablePedidosCheckOut").hide();
             }
     })
 

@@ -8,33 +8,33 @@
 	</parameter>
 	<parameter name="VAR_USER" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[SELECT CLIENTE.ID_CLIENTE,CLIENTE.NOMBRE_COMPLETO,CONCAT_WS(' ',USUARIO.NOMBRE,USUARIO.APELLIDO_P,USUARIO.APELLIDO_M) AS NOMBRE,DETALLE_PEDIDO.CLAVE,DETALLE_PEDIDO.DESCRIPCION,
+		<![CDATA[SELECT cliente.ID_CLIENTE,cliente.NOMBRE_COMPLETO,CONCAT_WS(' ',usuario.NOMBRE,usuario.APELLIDO_P,usuario.APELLIDO_M) AS NOMBRE,detalle_pedido.CLAVE,detalle_pedido.DESCRIPCION,
         CASE
-            WHEN DETALLE_PEDIDO.PIEZA > 0 AND DETALLE_PEDIDO.PAQUETE >0 THEN ((CAST(ALMACEN.CANTIDAD AS SIGNED)*CAST(DETALLE_PEDIDO.PAQUETE AS SIGNED))+CAST(DETALLE_PEDIDO.PIEZA AS SIGNED))
-            WHEN DETALLE_PEDIDO.PIEZA > 0 THEN DETALLE_PEDIDO.PIEZA ELSE (CAST(ALMACEN.CANTIDAD AS SIGNED)*CAST(DETALLE_PEDIDO.PAQUETE AS SIGNED))
+            WHEN detalle_pedido.PIEZA > 0 AND detalle_pedido.PAQUETE >0 THEN ((CAST(almacen.CANTIDAD AS SIGNED)*CAST(detalle_pedido.PAQUETE AS SIGNED))+CAST(detalle_pedido.PIEZA AS SIGNED))
+            WHEN detalle_pedido.PIEZA > 0 THEN detalle_pedido.PIEZA ELSE (CAST(almacen.CANTIDAD AS SIGNED)*CAST(detalle_pedido.PAQUETE AS SIGNED))
         END AS PIEZAS,
         CASE
-            WHEN DETALLE_PEDIDO.PIEZA > 0 AND DETALLE_PEDIDO.PAQUETE >0 THEN (((CAST(ALMACEN.CANTIDAD AS SIGNED)*CAST(detalle_pedido.paquete_sl AS SIGNED))+CAST(DETALLE_PEDIDO.PIEZA AS SIGNED))-(CAST(DETALLE_PEDIDO.PIEZA AS SIGNED)-CAST(DETALLE_PEDIDO.pieza_sl AS SIGNED)))
-            WHEN DETALLE_PEDIDO.PIEZA > 0 THEN (DETALLE_PEDIDO.pieza_sl) ELSE (CAST(ALMACEN.CANTIDAD AS SIGNED)*CAST(detalle_pedido.paquete_sl AS SIGNED))
+            WHEN detalle_pedido.PIEZA > 0 AND detalle_pedido.PAQUETE >0 THEN (((CAST(almacen.CANTIDAD AS SIGNED)*CAST(detalle_pedido.paquete_sl AS SIGNED))+CAST(detalle_pedido.PIEZA AS SIGNED))-(CAST(detalle_pedido.PIEZA AS SIGNED)-CAST(detalle_pedido.pieza_sl AS SIGNED)))
+            WHEN detalle_pedido.PIEZA > 0 THEN (detalle_pedido.pieza_sl) ELSE (CAST(almacen.CANTIDAD AS SIGNED)*CAST(detalle_pedido.paquete_sl AS SIGNED))
         END AS PIEZA_SL,
 
-        (((CAST(ALMACEN.CANTIDAD AS SIGNED)*CAST(DETALLE_PEDIDO.PAQUETE AS SIGNED))+CAST(DETALLE_PEDIDO.PIEZA AS SIGNED))-(((CAST(ALMACEN.CANTIDAD AS SIGNED)*CAST(detalle_pedido.paquete_sl AS SIGNED))+CAST(DETALLE_PEDIDO.PIEZA AS SIGNED))-(CAST(DETALLE_PEDIDO.PIEZA AS SIGNED)-CAST(DETALLE_PEDIDO.PIEZA_SL AS SIGNED))))
+        (((CAST(almacen.CANTIDAD AS SIGNED)*CAST(detalle_pedido.PAQUETE AS SIGNED))+CAST(detalle_pedido.PIEZA AS SIGNED))-(((CAST(almacen.CANTIDAD AS SIGNED)*CAST(detalle_pedido.paquete_sl AS SIGNED))+CAST(detalle_pedido.PIEZA AS SIGNED))-(CAST(detalle_pedido.PIEZA AS SIGNED)-CAST(detalle_pedido.PIEZA_SL AS SIGNED))))
         AS SURTIDO,
 
         CASE
-        WHEN (CAST(DETALLE_PEDIDO.PIEZA AS SIGNED)-CAST(DETALLE_PEDIDO.PIEZA_SL AS SIGNED)) = 0 THEN 'No hubo existencias'
-        WHEN (CAST(DETALLE_PEDIDO.PIEZA AS SIGNED)-CAST(DETALLE_PEDIDO.PIEZA_SL AS SIGNED)) > 0 THEN ''
+        WHEN (CAST(detalle_pedido.PIEZA AS SIGNED)-CAST(detalle_pedido.PIEZA_SL AS SIGNED)) = 0 THEN 'No hubo existencias'
+        WHEN (CAST(detalle_pedido.PIEZA AS SIGNED)-CAST(detalle_pedido.PIEZA_SL AS SIGNED)) > 0 THEN ''
         END AS MENSAJE,
-        PEDIDO.FOLIO,
-        PEDIDO.OBSERVACION,
-        PEDIDO.METODO_ENVIO,
-        PEDIDO.FECHA
-        FROM PEDIDO
-        INNER JOIN DETALLE_PEDIDO ON PEDIDO.ID = DETALLE_PEDIDO.ID_DETALLE
-        INNER JOIN CLIENTE ON PEDIDO.CLIENTE = CLIENTE.ID_CLIENTE
-        INNER JOIN USUARIO ON PEDIDO.VENDEDOR = USUARIO.id
-        INNER JOIN ALMACEN ON DETALLE_PEDIDO.CLAVE = ALMACEN.CLAVE
-        WHERE DETALLE_PEDIDO.ID_DETALLE = $P{ID_PEDIDO} ORDER BY SURTIDO ASC;]]>
+        pedido.FOLIO,
+        pedido.OBSERVACION,
+        pedido.METODO_ENVIO,
+        pedido.FECHA
+        FROM pedido
+        INNER JOIN detalle_pedido ON pedido.ID = detalle_pedido.ID_DETALLE
+        INNER JOIN cliente ON pedido.CLIENTE = cliente.ID_CLIENTE
+        INNER JOIN usuario ON pedido.VENDEDOR = usuario.id
+        INNER JOIN almacen ON detalle_pedido.CLAVE = almacen.CLAVE
+        WHERE detalle_pedido.ID_DETALLE = 43 ORDER BY surtido ASC;]]>
 	</queryString>
 	<field name="ID_CLIENTE" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
@@ -86,7 +86,7 @@
 			</staticText>
 			<image>
 				<reportElement x="0" y="0" width="141" height="62" uuid="9c685845-17d6-4fb4-aae4-6a1985fedb69"/>
-				<imageExpression><![CDATA["http://192.168.0.18/KachaWeb/img/logo.png"]]></imageExpression>
+				<imageExpression><![CDATA["https://iksacloud.webipadsa.com/img/src/logo.png"]]></imageExpression>
 			</image>
 		</band>
 	</title>
